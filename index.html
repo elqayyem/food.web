@@ -4,6 +4,23 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>مطعم وسناك فول وحمص</title>
+
+  <!-- SECURITY: Referrer policy — only send origin, not full URL -->
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
+
+  <!-- SECURITY: Content Security Policy — restrict where resources can load from -->
+  <meta http-equiv="Content-Security-Policy" content="
+    default-src 'self' https:;
+    script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com;
+    style-src  'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;
+    font-src   'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;
+    img-src    'self' https: data:;
+    connect-src 'self' https://hnyzgeucabtpppyxnsel.supabase.co;
+    frame-ancestors 'none';
+  " />
+
+  <!-- SECURITY: Disable access to sensitive browser APIs not needed by this site -->
+  <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
@@ -513,7 +530,7 @@
       </ul>
 
       <div style="display:flex;align-items:center;gap:12px">
-        <a href="https://wa.me/9613280613" target="_blank" class="nav-cta">
+        <a href="https://wa.me/9613280613" target="_blank" rel="noopener noreferrer" class="nav-cta">
           <i class="fab fa-whatsapp"></i> اطلب الآن
         </a>
         <div class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="القائمة">
@@ -538,7 +555,7 @@
         </p>
         <div class="hero-btns">
           <a href="#menu" class="btn-red" id="heroBtnMenu"><i class="fas fa-utensils"></i> عرض المنيو</a>
-          <a href="https://wa.me/9613280613" target="_blank" class="btn-outline" id="heroBtnOrder">
+          <a href="https://wa.me/9613280613" target="_blank" rel="noopener noreferrer" class="btn-outline" id="heroBtnOrder">
             <i class="fab fa-whatsapp"></i> اطلب الآن
           </a>
         </div>
@@ -1011,14 +1028,14 @@
           </a>
           <p>أطيب المأكولات الشرقية والغربية بطعم لا يُقاوم وجودة عالية.</p>
           <div class="social-row">
-            <a href="https://www.instagram.com/rinawi.restaurant2" target="_blank" class="soc-btn" aria-label="إنستغرام"><i class="fab fa-instagram"></i></a>
-            <a href="https://wa.me/9613280613" target="_blank" class="soc-btn" aria-label="واتساب"><i class="fab fa-whatsapp"></i></a>
+            <a href="https://www.instagram.com/rinawi.restaurant2" target="_blank" rel="noopener noreferrer" class="soc-btn" aria-label="إنستغرام"><i class="fab fa-instagram"></i></a>
+            <a href="https://wa.me/9613280613" target="_blank" rel="noopener noreferrer" class="soc-btn" aria-label="واتساب"><i class="fab fa-whatsapp"></i></a>
           </div>
         </div>
 
         <div class="footer-col">
           <h4>للطلب والاستفسار</h4>
-          <a href="https://wa.me/9613280613" target="_blank" id="footerWaLink">
+          <a href="https://wa.me/9613280613" target="_blank" rel="noopener noreferrer" id="footerWaLink">
             <i class="fab fa-whatsapp"></i> <span id="footerWaText">+961 3 280 613</span>
           </a>
           <a href="tel:+9613280613" id="footerPhoneLink">
@@ -1049,7 +1066,7 @@
   <a href="admin.html" style="position:fixed;bottom:26px;right:26px;z-index:998;width:36px;height:36px;background:rgba(255,255,255,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.4);font-size:14px;text-decoration:none;transition:.3s" title="لوحة التحكم"><i class="fas fa-lock"></i></a>
 
   <!-- WhatsApp float -->
-  <a href="https://wa.me/9613280613" class="wa-float" target="_blank" aria-label="تواصل عبر واتساب">
+  <a href="https://wa.me/9613280613" class="wa-float" target="_blank" rel="noopener noreferrer" aria-label="تواصل عبر واتساب">
     <i class="fab fa-whatsapp"></i>
   </a>
 

@@ -4,6 +4,26 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>لوحة التحكم – مطعم وسناك فول وحمص</title>
+
+<!-- SECURITY: Referrer policy -->
+<meta name="referrer" content="strict-origin-when-cross-origin"/>
+
+<!-- SECURITY: CSP — only allow resources from trusted sources -->
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self' https:;
+  script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com;
+  style-src  'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;
+  font-src   'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;
+  img-src    'self' https: data: blob:;
+  connect-src 'self' https://hnyzgeucabtpppyxnsel.supabase.co;
+  frame-ancestors 'none';
+"/>
+
+<!-- SECURITY: Block embedding this page in iframes (clickjacking protection) -->
+<meta http-equiv="X-Frame-Options" content="DENY"/>
+
+<!-- SECURITY: Disable sensitive browser APIs -->
+<meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()"/>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 <style>
@@ -468,7 +488,7 @@ tr.dragging{opacity:.4}
           <span class="topbar-title" id="topbarTitle">لوحة التحكم</span>
         </div>
         <div class="topbar-right">
-          <a href="index.html" target="_blank" class="btn-site"><i class="fas fa-external-link-alt"></i> عرض الموقع</a>
+          <a href="index.html" target="_blank" rel="noopener noreferrer" class="btn-site"><i class="fas fa-external-link-alt"></i> عرض الموقع</a>
         </div>
       </header>
 
@@ -694,6 +714,32 @@ const DEFAULTS = {
 };
 
 const CAT_NAMES = {sandwiches:'ساندويشات',shawarma:'شاورما',grills:'مشاوي',chicken:'فراريج',meals:'وجبات'};
+
+/* ════════════════════════════════════════════════
+   SECURITY HELPERS
+════════════════════════════════════════════════ */
+
+/* Escape HTML special chars — prevents XSS when injecting into innerHTML */
+function escapeHTML(str) {
+  return String(str || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
+
+/* Allow only http/https URLs for images — blocks javascript: and data: URIs */
+function sanitizeURL(url) {
+  const s = String(url || '').trim();
+  if (/^https?:\/\//i.test(s)) return s;
+  return '';
+}
+
+/* Sanitize and trim a text input — strips tags, limits length */
+function sanitizeInput(str, maxLen = 300) {
+  return String(str || '').replace(/<[^>]*>/g, '').trim().slice(0, maxLen);
+}
 const STATUS_LABELS = {new:'جديد',preparing:'قيد التحضير',ready:'جاهز',delivered:'تم التسليم',cancelled:'ملغى'};
 const STATUS_COLORS = {new:'blue',preparing:'yellow',ready:'green',delivered:'gray',cancelled:'badge-red'};
 
@@ -920,12 +966,13 @@ function renderMenuTable() {
     (!catF || i.category === catF)
   ).sort((a,b) => a.order - b.order);
 
+  /* SECURITY: escapeHTML on all user data rendered into innerHTML */
   document.getElementById('menuTbody').innerHTML = items.length ? items.map(item => `
     <tr>
-      <td><img class="td-img" src="${item.image}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/50'"/></td>
-      <td style="font-weight:700">${item.name}</td>
-      <td><span style="font-weight:800;color:var(--gold)">${item.price.toLocaleString()} ل.ل</span></td>
-      <td><span class="badge badge-blue">${CAT_NAMES[item.category]||item.category}</span></td>
+      <td><img class="td-img" src="${sanitizeURL(item.image)||'https://placehold.co/50'}" alt="${escapeHTML(item.name)}" onerror="this.src='https://placehold.co/50'"/></td>
+      <td style="font-weight:700">${escapeHTML(item.name)}</td>
+      <td><span style="font-weight:800;color:var(--gold)">${Number(item.price).toLocaleString()} ل.ل</span></td>
+      <td><span class="badge badge-blue">${escapeHTML(CAT_NAMES[item.category]||item.category)}</span></td>
       <td>
         <label class="toggle">
           <input type="checkbox" ${item.popular?'checked':''} onchange="toggleMenuPopular(${item.id})"/>
@@ -989,12 +1036,15 @@ function openMenuModal(id) {
 }
 
 function saveMenuItem(id) {
-  const name = document.getElementById('mi_name').value.trim();
+  /* SECURITY: sanitizeInput() strips HTML tags and limits length */
+  const name = sanitizeInput(document.getElementById('mi_name').value, 100);
   const price = parseInt(document.getElementById('mi_price').value);
   const cat = document.getElementById('mi_cat').value;
-  const img = document.getElementById('mi_img').value.trim();
+  /* SECURITY: sanitizeURL() blocks javascript: and data: URIs */
+  const img = sanitizeURL(document.getElementById('mi_img').value.trim());
   const pop = document.getElementById('mi_pop').checked;
   if (!name || !price || !img) { toast('الرجاء تعبئة جميع الحقول المطلوبة','error'); return; }
+  if (price < 0 || price > 99999999) { toast('السعر غير صالح','error'); return; }
   const d = getData();
   if (id) {
     const i = d.menuItems.findIndex(x=>x.id===id);
@@ -1088,8 +1138,9 @@ function openMealModal(id) {
 }
 
 function saveMeal(id) {
-  const name = document.getElementById('mel_name').value.trim();
-  const img = document.getElementById('mel_img').value.trim();
+  /* SECURITY: sanitize all inputs */
+  const name = sanitizeInput(document.getElementById('mel_name').value, 80);
+  const img = sanitizeURL(document.getElementById('mel_img').value.trim());
   if (!name) { toast('أدخل اسم الفئة','error'); return; }
   const d = getData();
   if (id) {
@@ -1125,9 +1176,11 @@ function openMealItemModal(mealId, idx) {
 }
 
 function saveMealItem(mealId, idx) {
-  const name = document.getElementById('meli_name').value.trim();
+  /* SECURITY: sanitize inputs */
+  const name = sanitizeInput(document.getElementById('meli_name').value, 100);
   const price = parseInt(document.getElementById('meli_price').value);
   if (!name || !price) { toast('أكمل جميع الحقول','error'); return; }
+  if (price < 0 || price > 99999999) { toast('السعر غير صالح','error'); return; }
   const d = getData();
   const meal = d.meals.find(m=>m.id===mealId);
   if (idx >= 0) { meal.items[idx] = {name,price}; }
@@ -1150,11 +1203,12 @@ function deleteMealItem(mealId, idx) {
 ════════════════════════════════════════════════ */
 function renderGrills() {
   const d = getData();
+  /* SECURITY: escapeHTML on all rendered grills data */
   document.getElementById('grillsTbody').innerHTML = d.grills.length ? d.grills.map(g => `
     <tr>
-      <td><img class="td-img" src="${g.image}" alt="${g.name}" onerror="this.src='https://via.placeholder.com/50'"/></td>
-      <td style="font-weight:700">${g.name}</td>
-      <td><span style="font-weight:800;color:var(--gold)">${g.price.toLocaleString()} ل.ل</span></td>
+      <td><img class="td-img" src="${sanitizeURL(g.image)||'https://placehold.co/50'}" alt="${escapeHTML(g.name)}" onerror="this.src='https://placehold.co/50'"/></td>
+      <td style="font-weight:700">${escapeHTML(g.name)}</td>
+      <td><span style="font-weight:800;color:var(--gold)">${Number(g.price).toLocaleString()} ل.ل</span></td>
       <td><label class="toggle"><input type="checkbox" ${g.popular?'checked':''} onchange="toggleGrillPopular(${g.id})"/><span class="toggle-slider"></span></label></td>
       <td>
         <div style="display:flex;gap:4px">
@@ -1191,11 +1245,13 @@ function openGrillModal(id) {
 }
 
 function saveGrill(id) {
-  const name = document.getElementById('gr_name').value.trim();
+  /* SECURITY: sanitize all inputs before saving */
+  const name = sanitizeInput(document.getElementById('gr_name').value, 100);
   const price = parseInt(document.getElementById('gr_price').value);
-  const img = document.getElementById('gr_img').value.trim();
+  const img = sanitizeURL(document.getElementById('gr_img').value.trim());
   const pop = document.getElementById('gr_pop').checked;
   if (!name || !price || !img) { toast('أكمل الحقول المطلوبة','error'); return; }
+  if (price < 0 || price > 99999999) { toast('السعر غير صالح','error'); return; }
   const d = getData();
   if (id) {
     const i = d.grills.findIndex(x=>x.id===id);

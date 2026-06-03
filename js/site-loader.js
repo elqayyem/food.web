@@ -33,7 +33,24 @@
     } catch (e) { return null; }
   }
 
-  /* ── Safely update text ── */
+  /* ── SECURITY: Escape HTML special characters to prevent XSS ── */
+  function escapeHTML(str) {
+    return String(str || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#x27;');
+  }
+
+  /* ── SECURITY: Only allow http/https image URLs — block javascript: and data: ── */
+  function sanitizeURL(url) {
+    const s = String(url || '').trim();
+    if (/^https?:\/\//i.test(s)) return s;
+    return 'https://placehold.co/300x160?text=Image'; /* safe fallback */
+  }
+
+  /* ── Safely update text (uses textContent — immune to XSS) ── */
   function setText(id, value) {
     const el = document.getElementById(id);
     if (el && value !== undefined) el.textContent = value;
@@ -78,14 +95,18 @@
     const grid = document.getElementById('menuGrid');
     if (!grid || !items) return;
     const sorted = [...items].sort((a, b) => a.order - b.order);
+    /* SECURITY: escapeHTML() on all user data, sanitizeURL() on images */
     grid.innerHTML = sorted.map(item => `
-      <div class="menu-card reveal" data-category="${item.category}" data-name="${item.name}">
+      <div class="menu-card reveal"
+           data-category="${escapeHTML(item.category)}"
+           data-name="${escapeHTML(item.name)}">
         ${item.popular ? '<span class="pop-badge">⭐ الأكثر طلباً</span>' : ''}
-        <img src="${item.image}" alt="${item.name}" loading="lazy"
-             onerror="this.src='https://placehold.co/300x160?text=${encodeURIComponent(item.name)}'"/>
+        <img src="${sanitizeURL(item.image)}"
+             alt="${escapeHTML(item.name)}" loading="lazy"
+             onerror="this.src='https://placehold.co/300x160?text=Image'"/>
         <div class="card-body">
-          <div class="card-name">${item.name}</div>
-          <div class="card-price">${item.price.toLocaleString()} ل.ل</div>
+          <div class="card-name">${escapeHTML(item.name)}</div>
+          <div class="card-price">${Number(item.price).toLocaleString()} ل.ل</div>
         </div>
       </div>`).join('');
     attachReveal(grid.querySelectorAll('.reveal'));
@@ -96,18 +117,20 @@
   function renderMeals(meals) {
     const grid = document.getElementById('mealsGrid');
     if (!grid || !meals) return;
+    /* SECURITY: escapeHTML() on all user-supplied strings */
     grid.innerHTML = meals.map(meal => `
       <div class="meal-cat reveal">
-        <div class="meal-cat-head"><h3>${meal.name}</h3></div>
+        <div class="meal-cat-head"><h3>${escapeHTML(meal.name)}</h3></div>
         <div class="meal-cat-body">
           <div class="meal-items-list">
             ${meal.items.map(item => `
               <div class="meal-row">
-                <span class="meal-row-name">${item.name}</span>
-                <span class="meal-row-price">${item.price.toLocaleString()}</span>
+                <span class="meal-row-name">${escapeHTML(item.name)}</span>
+                <span class="meal-row-price">${Number(item.price).toLocaleString()}</span>
               </div>`).join('')}
           </div>
-          <img src="${meal.image}" alt="${meal.name}" class="meal-cat-img"
+          <img src="${sanitizeURL(meal.image)}"
+               alt="${escapeHTML(meal.name)}" class="meal-cat-img"
                onerror="this.style.display='none'"/>
         </div>
       </div>`).join('');
@@ -118,14 +141,16 @@
   function renderGrills(grills) {
     const grid = document.getElementById('grillsGrid');
     if (!grid || !grills) return;
+    /* SECURITY: escapeHTML() + sanitizeURL() on all data */
     grid.innerHTML = grills.map(g => `
       <div class="grill-card reveal">
         ${g.popular ? '<span class="pop-badge">⭐ الأكثر طلباً</span>' : ''}
-        <img src="${g.image}" alt="${g.name}" loading="lazy"
-             onerror="this.src='https://placehold.co/300x150?text=${encodeURIComponent(g.name)}'"/>
+        <img src="${sanitizeURL(g.image)}"
+             alt="${escapeHTML(g.name)}" loading="lazy"
+             onerror="this.src='https://placehold.co/300x150?text=Image'"/>
         <div class="grill-card-body">
-          <div class="grill-card-name">${g.name}</div>
-          <div class="grill-card-price">${g.price.toLocaleString()} ل.ل</div>
+          <div class="grill-card-name">${escapeHTML(g.name)}</div>
+          <div class="grill-card-price">${Number(g.price).toLocaleString()} ل.ل</div>
         </div>
       </div>`).join('');
     attachReveal(grid.querySelectorAll('.reveal'));
@@ -135,11 +160,12 @@
   function renderFeatures(features) {
     const row = document.getElementById('featuresRow');
     if (!row || !features) return;
+    /* SECURITY: escapeHTML() on title and desc; icon is emoji only — safe */
     row.innerHTML = features.map(f => `
       <div class="feat-card reveal">
-        <div class="feat-icon">${f.icon}</div>
-        <h3>${f.title}</h3>
-        <p>${f.desc}</p>
+        <div class="feat-icon">${escapeHTML(f.icon)}</div>
+        <h3>${escapeHTML(f.title)}</h3>
+        <p>${escapeHTML(f.desc)}</p>
       </div>`).join('');
     attachReveal(row.querySelectorAll('.reveal'));
   }
