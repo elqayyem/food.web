@@ -1,0 +1,1736 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>لوحة التحكم – مطعم وسناك فول وحمص</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --red:#c8102e;--red2:#a00d24;--gold:#e8a020;
+  --sidebar:#1a2234;--sidebar2:#222d42;
+  --bg:#f0f2f7;--card:#fff;
+  --txt:#1a2234;--muted:#6b7280;
+  --border:#e5e7eb;
+  --green:#10b981;--yellow:#f59e0b;--danger:#ef4444;--info:#3b82f6;
+  --sh:0 2px 12px rgba(0,0,0,.08);--sh2:0 8px 32px rgba(0,0,0,.12);
+  --radius:12px;
+}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--txt);direction:rtl;min-height:100vh}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}
+
+/* ══════════ LOGIN ══════════ */
+#loginPage{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#1a2234 0%,#c8102e 100%);
+  padding:20px;
+}
+.login-box{
+  background:#fff;border-radius:20px;padding:48px 40px;
+  width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.25);
+  text-align:center;
+}
+.login-logo{
+  width:70px;height:70px;background:linear-gradient(135deg,var(--red),var(--gold));
+  border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:28px;margin:0 auto 16px;
+}
+.login-box h1{font-size:22px;font-weight:900;color:var(--txt);margin-bottom:4px}
+.login-box p{font-size:13px;color:var(--muted);margin-bottom:32px}
+.form-group{margin-bottom:18px;text-align:right}
+.form-group label{display:block;font-size:13px;font-weight:700;color:var(--txt);margin-bottom:6px}
+.form-group input{
+  width:100%;padding:12px 14px;border:2px solid var(--border);border-radius:10px;
+  font-family:'Cairo',sans-serif;font-size:14px;color:var(--txt);
+  background:#f9fafb;transition:border-color .2s;outline:none;direction:rtl;
+}
+.form-group input:focus{border-color:var(--red);background:#fff}
+.btn-login{
+  width:100%;padding:13px;background:var(--red);color:#fff;border:none;
+  border-radius:10px;font-family:'Cairo',sans-serif;font-size:15px;font-weight:800;
+  cursor:pointer;transition:background .2s,transform .2s;margin-top:8px;
+}
+.btn-login:hover{background:var(--red2);transform:translateY(-1px)}
+.login-error{
+  background:#fef2f2;border:1px solid #fecaca;color:#dc2626;
+  padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:16px;display:none;
+}
+
+/* ══════════ ADMIN LAYOUT ══════════ */
+#adminPanel{display:none;min-height:100vh}
+.admin-wrap{display:flex;min-height:100vh}
+
+/* SIDEBAR */
+.sidebar{
+  width:250px;background:var(--sidebar);flex-shrink:0;
+  display:flex;flex-direction:column;position:fixed;top:0;bottom:0;right:0;
+  overflow-y:auto;z-index:200;transition:transform .3s;
+}
+.sidebar-brand{
+  padding:22px 20px;border-bottom:1px solid rgba(255,255,255,.07);
+  display:flex;align-items:center;gap:12px;
+}
+.brand-icon{
+  width:42px;height:42px;background:linear-gradient(135deg,var(--red),var(--gold));
+  border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;
+}
+.brand-text .t1{display:block;font-size:11px;color:var(--gold);font-weight:700;line-height:1}
+.brand-text .t2{display:block;font-size:14px;color:#fff;font-weight:900;line-height:1.4}
+
+.sidebar-nav{flex:1;padding:12px 0}
+.nav-section{padding:8px 18px 4px;font-size:10px;font-weight:700;color:rgba(255,255,255,.35);letter-spacing:.08em;text-transform:uppercase}
+.nav-item{
+  display:flex;align-items:center;gap:12px;padding:11px 20px;
+  color:rgba(255,255,255,.65);text-decoration:none;font-size:13px;font-weight:600;
+  cursor:pointer;transition:background .2s,color .2s;border:none;background:none;width:100%;text-align:right;
+}
+.nav-item:hover{background:rgba(255,255,255,.07);color:#fff}
+.nav-item.active{background:rgba(200,16,46,.25);color:#fff;border-right:3px solid var(--red)}
+.nav-item i{width:18px;text-align:center;font-size:14px}
+.nav-item .badge{
+  margin-right:auto;background:var(--red);color:#fff;font-size:10px;font-weight:800;
+  padding:2px 7px;border-radius:20px;
+}
+
+.sidebar-footer{
+  padding:16px 20px;border-top:1px solid rgba(255,255,255,.07);
+}
+.admin-user{display:flex;align-items:center;gap:10px}
+.admin-avatar{
+  width:36px;height:36px;background:var(--red);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:800;flex-shrink:0;
+}
+.admin-user-info .name{font-size:13px;font-weight:700;color:#fff}
+.admin-user-info .role{font-size:11px;color:rgba(255,255,255,.45)}
+.btn-logout{
+  margin-right:auto;background:none;border:none;color:rgba(255,255,255,.5);
+  cursor:pointer;font-size:16px;transition:color .2s;padding:4px;
+}
+.btn-logout:hover{color:var(--red)}
+
+/* MAIN CONTENT */
+.main-content{
+  flex:1;margin-right:250px;display:flex;flex-direction:column;min-height:100vh;
+}
+.topbar{
+  background:#fff;border-bottom:1px solid var(--border);padding:0 28px;
+  height:64px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:100;box-shadow:var(--sh);
+}
+.topbar-title{font-size:18px;font-weight:900;color:var(--txt)}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.hamburger-btn{
+  display:none;background:none;border:none;cursor:pointer;
+  font-size:20px;color:var(--txt);padding:6px;
+}
+.btn-site{
+  display:flex;align-items:center;gap:6px;background:var(--bg);
+  color:var(--txt);border:1px solid var(--border);padding:7px 14px;
+  border-radius:8px;font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;
+  text-decoration:none;transition:background .2s;
+}
+.btn-site:hover{background:#e5e7eb}
+
+.page-body{padding:28px;flex:1}
+
+/* ── Sections ── */
+.dash-section{display:none}
+.dash-section.active{display:block}
+
+/* ══════════ COMPONENTS ══════════ */
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.page-header h2{font-size:20px;font-weight:900;color:var(--txt)}
+
+/* Buttons */
+.btn{
+  display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:9px;
+  border:none;cursor:pointer;font-family:'Cairo',sans-serif;font-size:13px;font-weight:700;
+  transition:background .2s,transform .15s,box-shadow .2s;
+}
+.btn:hover{transform:translateY(-1px)}
+.btn-primary{background:var(--red);color:#fff}
+.btn-primary:hover{background:var(--red2);box-shadow:0 4px 14px rgba(200,16,46,.35)}
+.btn-success{background:var(--green);color:#fff}
+.btn-success:hover{background:#059669}
+.btn-warning{background:var(--yellow);color:#fff}
+.btn-warning:hover{background:#d97706}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-danger:hover{background:#dc2626}
+.btn-info{background:var(--info);color:#fff}
+.btn-info:hover{background:#2563eb}
+.btn-secondary{background:#e5e7eb;color:var(--txt)}
+.btn-secondary:hover{background:#d1d5db}
+.btn-sm{padding:6px 12px;font-size:12px}
+
+/* Stats cards */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-bottom:28px}
+.stat-card{
+  background:var(--card);border-radius:var(--radius);padding:22px 20px;
+  box-shadow:var(--sh);display:flex;align-items:center;gap:16px;
+}
+.stat-icon{
+  width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+  font-size:22px;flex-shrink:0;
+}
+.stat-icon.red{background:#fef2f2;color:var(--red)}
+.stat-icon.green{background:#f0fdf4;color:var(--green)}
+.stat-icon.gold{background:#fffbeb;color:var(--yellow)}
+.stat-icon.blue{background:#eff6ff;color:var(--info)}
+.stat-num{font-size:26px;font-weight:900;color:var(--txt);line-height:1}
+.stat-lbl{font-size:12px;color:var(--muted);margin-top:2px}
+
+/* Cards */
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--sh);overflow:hidden}
+.card-head{
+  padding:18px 22px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.card-head h3{font-size:15px;font-weight:800;color:var(--txt)}
+.card-body{padding:22px}
+
+/* Table */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead th{
+  background:#f8fafc;padding:11px 14px;text-align:right;
+  font-weight:800;color:var(--muted);font-size:12px;border-bottom:2px solid var(--border);
+  white-space:nowrap;
+}
+tbody td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:#f8fafc}
+.td-img{width:50px;height:50px;object-fit:cover;border-radius:8px;display:block}
+.td-actions{display:flex;gap:6px;justify-content:flex-end}
+
+/* Badges */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
+.badge-red{background:#fef2f2;color:var(--red)}
+.badge-green{background:#f0fdf4;color:var(--green)}
+.badge-yellow{background:#fffbeb;color:var(--yellow)}
+.badge-blue{background:#eff6ff;color:var(--info)}
+.badge-gray{background:#f3f4f6;color:var(--muted)}
+
+/* Category map */
+.cat-map{sandwiches:'ساندويشات',shawarma:'شاورما',grills:'مشاوي',chicken:'فراريج',meals:'وجبات'}
+
+/* Forms */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:13px;font-weight:700;color:var(--txt);margin-bottom:6px}
+.form-control{
+  width:100%;padding:10px 13px;border:2px solid var(--border);border-radius:9px;
+  font-family:'Cairo',sans-serif;font-size:13px;color:var(--txt);background:#f9fafb;
+  transition:border-color .2s;outline:none;direction:rtl;
+}
+.form-control:focus{border-color:var(--red);background:#fff}
+.form-control select,.form-control textarea{resize:vertical}
+select.form-control{cursor:pointer}
+textarea.form-control{min-height:80px}
+
+/* Search bar */
+.search-bar{
+  display:flex;align-items:center;gap:8px;background:#f9fafb;
+  border:2px solid var(--border);border-radius:9px;padding:8px 13px;min-width:200px;
+}
+.search-bar input{background:none;border:none;outline:none;font-family:'Cairo',sans-serif;font-size:13px;width:100%;direction:rtl}
+.search-bar i{color:var(--muted)}
+
+/* Image preview */
+.img-preview{
+  width:80px;height:80px;object-fit:cover;border-radius:10px;
+  border:2px solid var(--border);display:block;margin-top:8px;
+}
+
+/* Toggle switch */
+.toggle{position:relative;display:inline-block;width:40px;height:22px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{
+  position:absolute;inset:0;background:#cbd5e1;border-radius:22px;cursor:pointer;
+  transition:background .2s;
+}
+.toggle-slider::before{
+  content:'';position:absolute;width:16px;height:16px;border-radius:50%;
+  background:#fff;top:3px;right:3px;transition:transform .2s;box-shadow:0 1px 4px rgba(0,0,0,.2);
+}
+.toggle input:checked+.toggle-slider{background:var(--green)}
+.toggle input:checked+.toggle-slider::before{transform:translateX(-18px)}
+
+/* Color input */
+.color-row{display:flex;align-items:center;gap:12px}
+.color-row input[type=color]{
+  width:48px;height:36px;border:2px solid var(--border);border-radius:8px;
+  padding:2px;cursor:pointer;background:#fff;flex-shrink:0;
+}
+.color-row .form-control{flex:1}
+
+/* Meal item row */
+.meal-item-row{
+  display:flex;align-items:center;gap:10px;padding:10px 14px;
+  background:#f8fafc;border-radius:9px;margin-bottom:8px;
+  border:1px solid var(--border);
+}
+.meal-item-row .meal-name{flex:1;font-size:13px;font-weight:700}
+.meal-item-row .meal-price{font-size:13px;font-weight:800;color:var(--gold)}
+
+/* Empty state */
+.empty-state{
+  text-align:center;padding:48px 20px;color:var(--muted);
+}
+.empty-state i{font-size:40px;margin-bottom:12px;opacity:.4}
+.empty-state p{font-size:14px}
+
+/* Media grid */
+.media-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px}
+.media-item{
+  background:var(--card);border-radius:10px;overflow:hidden;
+  border:2px solid var(--border);transition:border-color .2s;cursor:pointer;
+}
+.media-item:hover{border-color:var(--red)}
+.media-item img{width:100%;height:110px;object-fit:cover;display:block}
+.media-item-body{padding:8px 10px}
+.media-item-name{font-size:11px;font-weight:700;color:var(--txt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.media-item-actions{display:flex;gap:6px;margin-top:6px}
+
+/* Content editor sections */
+.content-section{
+  background:var(--card);border-radius:var(--radius);box-shadow:var(--sh);
+  margin-bottom:20px;overflow:hidden;
+}
+.content-section-head{
+  padding:15px 22px;background:#f8fafc;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;cursor:pointer;
+}
+.content-section-head h4{font-size:14px;font-weight:800;color:var(--txt)}
+.content-section-body{padding:22px}
+
+/* Order status */
+.order-row{background:var(--card);border-radius:10px;padding:16px 20px;margin-bottom:12px;box-shadow:var(--sh);display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.order-info{flex:1;min-width:0}
+.order-id{font-size:12px;color:var(--muted);margin-bottom:4px}
+.order-name{font-size:14px;font-weight:800}
+.order-items{font-size:12px;color:var(--muted);margin-top:2px}
+.order-price{font-size:16px;font-weight:900;color:var(--gold)}
+
+/* ══════════ MODAL ══════════ */
+#modalOverlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.55);
+  z-index:1000;display:none;align-items:center;justify-content:center;padding:20px;
+}
+#modalOverlay.open{display:flex}
+.modal{
+  background:#fff;border-radius:18px;width:100%;max-width:560px;
+  max-height:90vh;overflow-y:auto;box-shadow:var(--sh2);animation:modalIn .25s ease;
+}
+@keyframes modalIn{from{opacity:0;transform:scale(.95) translateY(-10px)}to{opacity:1;transform:none}}
+.modal-head{
+  padding:20px 24px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:1;
+}
+.modal-head h3{font-size:16px;font-weight:900;color:var(--txt)}
+.modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--muted);line-height:1;padding:4px}
+.modal-close:hover{color:var(--danger)}
+.modal-body{padding:24px}
+.modal-footer{
+  padding:16px 24px;border-top:1px solid var(--border);
+  display:flex;justify-content:flex-start;gap:10px;
+}
+
+/* ══════════ TOAST ══════════ */
+#toastContainer{position:fixed;bottom:24px;left:24px;z-index:2000;display:flex;flex-direction:column;gap:10px}
+.toast{
+  background:#1a2234;color:#fff;padding:13px 18px;border-radius:12px;
+  font-size:13px;font-weight:600;display:flex;align-items:center;gap:10px;
+  box-shadow:0 4px 20px rgba(0,0,0,.2);min-width:240px;
+  animation:toastIn .3s ease;
+}
+.toast.success{background:#059669}
+.toast.error{background:#dc2626}
+.toast.warning{background:#d97706}
+@keyframes toastIn{from{opacity:0;transform:translateX(-20px)}to{opacity:1;transform:none}}
+
+/* ══════════ CONFIRM DIALOG ══════════ */
+#confirmOverlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.55);
+  z-index:1100;display:none;align-items:center;justify-content:center;padding:20px;
+}
+#confirmOverlay.open{display:flex}
+.confirm-box{
+  background:#fff;border-radius:16px;padding:32px 28px;max-width:380px;width:100%;
+  text-align:center;box-shadow:var(--sh2);
+}
+.confirm-icon{font-size:40px;margin-bottom:12px}
+.confirm-box h3{font-size:17px;font-weight:900;margin-bottom:8px}
+.confirm-box p{font-size:13px;color:var(--muted);margin-bottom:24px}
+.confirm-btns{display:flex;gap:10px;justify-content:center}
+
+/* ══════════ RESPONSIVE ══════════ */
+@media(max-width:1024px){.stats-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:820px){
+  .sidebar{transform:translateX(100%)}
+  .sidebar.open{transform:translateX(0)}
+  .main-content{margin-right:0}
+  .hamburger-btn{display:flex}
+  .stats-grid{grid-template-columns:repeat(2,1fr)}
+  .form-row{grid-template-columns:1fr}
+  .page-body{padding:16px}
+}
+@media(max-width:480px){.stats-grid{grid-template-columns:1fr}}
+
+/* design preview strip */
+.color-preview{height:6px;border-radius:6px;margin-top:24px;display:flex;overflow:hidden}
+.color-preview span{flex:1;transition:background .3s}
+
+/* drag handle */
+.drag-handle{cursor:grab;color:var(--muted);padding:4px 8px;font-size:16px}
+.drag-handle:active{cursor:grabbing}
+tr.dragging{opacity:.4}
+
+/* sidebar overlay for mobile */
+#sidebarOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:190}
+#sidebarOverlay.open{display:block}
+</style>
+</head>
+<body>
+
+<!-- ══════════ LOGIN PAGE ══════════ -->
+<div id="loginPage">
+  <div class="login-box">
+    <div class="login-logo">🍽️</div>
+    <h1>لوحة التحكم</h1>
+    <p>مطعم وسناك فول وحمص</p>
+    <div class="login-error" id="loginError"><i class="fas fa-exclamation-circle"></i> اسم المستخدم أو كلمة المرور غلط</div>
+    <div class="form-group">
+      <label>اسم المستخدم</label>
+      <input type="text" id="loginUser" placeholder="admin" autocomplete="username"/>
+    </div>
+    <div class="form-group">
+      <label>كلمة المرور</label>
+      <input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password"/>
+    </div>
+    <button class="btn-login" onclick="doLogin()"><i class="fas fa-sign-in-alt"></i> دخول</button>
+  </div>
+</div>
+
+<!-- ══════════ ADMIN PANEL ══════════ -->
+<div id="adminPanel">
+  <div id="sidebarOverlay" onclick="closeSidebar()"></div>
+  <div class="admin-wrap">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon">🍽️</div>
+        <div class="brand-text"><span class="t1">مطعم وسناك</span><span class="t2">فول وحمص</span></div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section">الرئيسية</div>
+        <button class="nav-item active" onclick="showPage('overview',this)"><i class="fas fa-tachometer-alt"></i> لوحة التحكم</button>
+
+        <div class="nav-section">إدارة المحتوى</div>
+        <button class="nav-item" onclick="showPage('menu',this)"><i class="fas fa-utensils"></i> المنيو</button>
+        <button class="nav-item" onclick="showPage('meals',this)"><i class="fas fa-bowl-food"></i> الوجبات</button>
+        <button class="nav-item" onclick="showPage('grills',this)"><i class="fas fa-fire"></i> المشاوي</button>
+        <button class="nav-item" onclick="showPage('content',this)"><i class="fas fa-pen-to-square"></i> النصوص</button>
+
+        <div class="nav-section">الإعدادات</div>
+        <button class="nav-item" onclick="showPage('design',this)"><i class="fas fa-palette"></i> التصميم</button>
+        <button class="nav-item" onclick="showPage('contact',this)"><i class="fas fa-phone"></i> معلومات التواصل</button>
+        <button class="nav-item" onclick="showPage('media',this)"><i class="fas fa-images"></i> الصور</button>
+        <button class="nav-item" onclick="showPage('orders',this)">
+          <i class="fas fa-shopping-bag"></i> الطلبات
+          <span class="badge" id="ordersCount">0</span>
+        </button>
+        <button class="nav-item" onclick="showPage('settings',this)"><i class="fas fa-gear"></i> الإعدادات</button>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="admin-user">
+          <div class="admin-avatar" id="adminInitial">A</div>
+          <div class="admin-user-info">
+            <div class="name" id="adminName">Admin</div>
+            <div class="role">مدير الموقع</div>
+          </div>
+          <button class="btn-logout" onclick="doLogout()" title="تسجيل الخروج"><i class="fas fa-sign-out-alt"></i></button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+      <header class="topbar">
+        <div style="display:flex;align-items:center;gap:12px">
+          <button class="hamburger-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+          <span class="topbar-title" id="topbarTitle">لوحة التحكم</span>
+        </div>
+        <div class="topbar-right">
+          <a href="index.html" target="_blank" class="btn-site"><i class="fas fa-external-link-alt"></i> عرض الموقع</a>
+        </div>
+      </header>
+
+      <div class="page-body">
+
+        <!-- ── OVERVIEW ── -->
+        <div id="sec-overview" class="dash-section active">
+          <div class="stats-grid" id="statsGrid"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px" id="overviewCards"></div>
+        </div>
+
+        <!-- ── MENU ── -->
+        <div id="sec-menu" class="dash-section">
+          <div class="page-header">
+            <h2><i class="fas fa-utensils" style="color:var(--red)"></i> إدارة المنيو</h2>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <div class="search-bar"><i class="fas fa-search"></i><input type="text" id="menuSearch" placeholder="بحث..." oninput="renderMenuTable()"/></div>
+              <select class="form-control" id="menuCatFilter" onchange="renderMenuTable()" style="width:140px">
+                <option value="">كل الأصناف</option>
+                <option value="sandwiches">ساندويشات</option>
+                <option value="shawarma">شاورما</option>
+                <option value="grills">مشاوي</option>
+                <option value="chicken">فراريج</option>
+                <option value="meals">وجبات</option>
+              </select>
+              <button class="btn btn-primary" onclick="openMenuModal()"><i class="fas fa-plus"></i> إضافة صنف</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="tbl-wrap">
+              <table>
+                <thead><tr><th>الصورة</th><th>الاسم</th><th>السعر</th><th>التصنيف</th><th>مميز</th><th>الترتيب</th><th>إجراءات</th></tr></thead>
+                <tbody id="menuTbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── MEALS ── -->
+        <div id="sec-meals" class="dash-section">
+          <div class="page-header">
+            <h2><i class="fas fa-bowl-food" style="color:var(--red)"></i> إدارة الوجبات</h2>
+            <button class="btn btn-primary" onclick="openMealModal()"><i class="fas fa-plus"></i> إضافة فئة</button>
+          </div>
+          <div id="mealsEditor"></div>
+        </div>
+
+        <!-- ── GRILLS ── -->
+        <div id="sec-grills" class="dash-section">
+          <div class="page-header">
+            <h2><i class="fas fa-fire" style="color:var(--red)"></i> إدارة المشاوي</h2>
+            <button class="btn btn-primary" onclick="openGrillModal()"><i class="fas fa-plus"></i> إضافة صنف</button>
+          </div>
+          <div class="card">
+            <div class="tbl-wrap">
+              <table>
+                <thead><tr><th>الصورة</th><th>الاسم</th><th>السعر</th><th>مميز</th><th>الترتيب</th><th>إجراءات</th></tr></thead>
+                <tbody id="grillsTbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── CONTENT ── -->
+        <div id="sec-content" class="dash-section">
+          <div class="page-header">
+            <h2><i class="fas fa-pen-to-square" style="color:var(--red)"></i> تعديل النصوص</h2>
+            <button class="btn btn-primary" onclick="saveContent()"><i class="fas fa-save"></i> حفظ التغييرات</button>
+          </div>
+          <div id="contentEditor"></div>
+        </div>
+
+        <!-- ── DESIGN ── -->
+        <div id="sec-design" class="dash-section">
+          <div class="page-header">
+            <h2><i class="fas fa-palette" style="color:var(--red)"></i> إعدادات التصميم</h2>
+            <button class="btn btn-primary" onclick="saveDesign()"><i class="fas fa-save"></i> حفظ وتطبيق</button>
+          </div>
+          <div id="designEditor"></div>
+        </div>
+
+        <!-- ── CONTACT ── -->
+        <div id="sec-contact" class="dash-section">
+          <div class="page-header">
+            <h2><i class="fas fa-phone" style="color:var(--red)"></i> معلومات التواصل</h2>
+            <button class="btn btn-primary" onclick="saveContact()"><i class="fas fa-save"></i> حفظ</button>
+          </div>
+          <div id="contactEditor"></div>
+        </div>
+
+        <!-- ── MEDIA ── -->
+        <div id="sec-media" class="dash-section">
+          <div class="page-header">
+            <h2><i class="fas fa-images" style="color:var(--red)"></i> مكتبة الصور</h2>
+          </div>
+          <div id="mediaEditor"></div>
+        </div>
+
+        <!-- ── ORDERS ── -->
+        <div id="sec-orders" class="dash-section">
+          <div class="page-header">
+            <h2><i class="fas fa-shopping-bag" style="color:var(--red)"></i> الطلبات</h2>
+            <button class="btn btn-secondary" onclick="clearOrders()"><i class="fas fa-trash"></i> مسح الكل</button>
+          </div>
+          <div id="ordersEditor"></div>
+        </div>
+
+        <!-- ── SETTINGS ── -->
+        <div id="sec-settings" class="dash-section">
+          <div class="page-header">
+            <h2><i class="fas fa-gear" style="color:var(--red)"></i> الإعدادات</h2>
+          </div>
+          <div id="settingsEditor"></div>
+        </div>
+
+      </div><!-- /page-body -->
+    </div><!-- /main-content -->
+  </div><!-- /admin-wrap -->
+</div><!-- /adminPanel -->
+
+<!-- MODAL -->
+<div id="modalOverlay" onclick="handleModalClick(event)">
+  <div class="modal" id="modalBox">
+    <div class="modal-head">
+      <h3 id="modalTitle">العنوان</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer" id="modalFooter"></div>
+  </div>
+</div>
+
+<!-- CONFIRM -->
+<div id="confirmOverlay">
+  <div class="confirm-box">
+    <div class="confirm-icon">⚠️</div>
+    <h3>تأكيد الحذف</h3>
+    <p id="confirmMsg">هل أنت متأكد من هذه العملية؟</p>
+    <div class="confirm-btns">
+      <button class="btn btn-danger" id="confirmOkBtn">حذف</button>
+      <button class="btn btn-secondary" onclick="closeConfirm()">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div id="toastContainer"></div>
+
+<script>
+/* ════════════════════════════════════════════════
+   DEFAULT DATA — full restaurant data model
+════════════════════════════════════════════════ */
+const DEFAULTS = {
+  version: '1.0',
+  credentials: { username: 'admin', password: 'admin123' },
+  hero: {
+    title1: 'مطعم وسناك', title2: 'فول وحمص',
+    welcome: 'يرحب بكم',
+    description: 'أطيب المأكولات الشرقية والغربية\nبطعم لا يُقاوم وجودة عالية',
+    btnMenu: 'عرض المنيو', btnOrder: 'اطلب الآن',
+    img1:'https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=800&q=80',
+    img2:'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500&q=80',
+    img3:'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=500&q=80'
+  },
+  navbar:{ logo1:'مطعم وسناك', logo2:'فول وحمص', cta:'اطلب الآن' },
+  contact:{
+    phone:'+961 3 280 613', whatsapp:'9613280613',
+    address1:'لبنان، طرابلس', address2:'سوق مخيم البداوي',
+    hoursFrom:'من 10:00 صباحاً', hoursTo:'حتى 12:00 منتصف الليل'
+  },
+  design:{ primary:'#c8102e', accent:'#e8a020', dark:'#0d0d0d' },
+  about:{
+    title:'عن مطعمنا',
+    p1:'مطعم وسناك فول وحمص — وجهتك المثالية لتذوّق أشهى المأكولات الشرقية والغربية. نقدّم لك تجربة طعام استثنائية بمكوّنات طازجة وطهاة محترفين، في قلب سوق مخيم البداوي في طرابلس.',
+    p2:'من الشاورما الكريمية إلى المشاوي الشهية، كل طبق يُحضَّر بشغف ليمنحك طعماً لا تنساه. نحن فخورون بخدمة عملائنا بأعلى المعايير.',
+    stat1:'+500', stat1L:'عميل سعيد يومياً',
+    stat2:'+20',  stat2L:'صنف متنوع',
+    stat3:'100%', stat3L:'جودة ونظافة',
+    img:'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&q=80'
+  },
+  features:[
+    {id:1,icon:'🏆',title:'جودة عالية',desc:'نستخدم أفضل المكونات الطازجة لضمان أعلى جودة وأشهى طعم'},
+    {id:2,icon:'🔥',title:'طازج دائماً',desc:'جميع الأطباق تُحضَّر لحظة طلبها بكل حب وعناية'},
+    {id:3,icon:'🛵',title:'توصيل سريع',desc:'خدمة توصيل سريعة إلى باب منزلك في أسرع وقت'}
+  ],
+  menuItems:[
+    {id:1,name:'بطاطا',price:200,category:'sandwiches',image:'https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400&q=80',popular:false,order:1},
+    {id:2,name:'لفة كريسبى',price:400,category:'sandwiches',image:'https://images.unsplash.com/photo-1562967914-608f82629710?w=400&q=80',popular:true,order:2},
+    {id:3,name:'لفة طاووق',price:400,category:'sandwiches',image:'https://images.unsplash.com/photo-1601400745779-3b2b36a01d60?w=400&q=80',popular:false,order:3},
+    {id:4,name:'لفة سجق',price:400,category:'sandwiches',image:'https://images.unsplash.com/photo-1619096252214-ef06c45683e3?w=400&q=80',popular:false,order:4},
+    {id:5,name:'سمون برغر',price:400,category:'sandwiches',image:'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&q=80',popular:true,order:5},
+    {id:6,name:'تشيكن برغر',price:350,category:'sandwiches',image:'https://images.unsplash.com/photo-1606755962773-d324e0a13086?w=400&q=80',popular:false,order:6},
+    {id:7,name:'سمون زنجر',price:450,category:'sandwiches',image:'https://images.unsplash.com/photo-1610614991668-68795bb32088?w=400&q=80',popular:false,order:7},
+    {id:8,name:'سمون اسكالوب',price:450,category:'sandwiches',image:'https://images.unsplash.com/photo-1585325701956-60dd9c8553bc?w=400&q=80',popular:false,order:8},
+    {id:9,name:'فاهيتا',price:650,category:'sandwiches',image:'https://images.unsplash.com/photo-1534938665420-4193effeacc4?w=400&q=80',popular:false,order:9},
+    {id:10,name:'شاورما كبير',price:400,category:'shawarma',image:'https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=400&q=80',popular:true,order:10},
+    {id:11,name:'شاورما صغير',price:200,category:'shawarma',image:'https://images.unsplash.com/photo-1613987548851-d9b7967f3d66?w=400&q=80',popular:false,order:11},
+    {id:12,name:'شاورما تركي',price:650,category:'shawarma',image:'https://images.unsplash.com/photo-1625058547878-5ce47a71f960?w=400&q=80',popular:false,order:12},
+    {id:13,name:'كفتة جاج',price:800,category:'grills',image:'https://images.unsplash.com/photo-1544025162-d76538ab0a65?w=400&q=80',popular:false,order:13},
+    {id:14,name:'كفتة لحمة',price:1900,category:'grills',image:'https://images.unsplash.com/photo-1528207776546-365bb710ee93?w=400&q=80',popular:false,order:14},
+    {id:15,name:'مشاوي مشكل',price:1800,category:'grills',image:'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&q=80',popular:true,order:15},
+    {id:16,name:'شقف',price:2400,category:'grills',image:'https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=400&q=80',popular:false,order:16},
+    {id:17,name:'طاووق مشوي',price:1300,category:'grills',image:'https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=400&q=80',popular:false,order:17},
+    {id:18,name:'فروج غاز',price:800,category:'chicken',image:'https://images.unsplash.com/photo-1598103442097-8b74394b95c3?w=400&q=80',popular:false,order:18},
+    {id:19,name:'فروج فحم',price:800,category:'chicken',image:'https://images.unsplash.com/photo-1598103442097-8b74394b95c3?w=400&q=80',popular:false,order:19},
+    {id:20,name:'كريسبي كبيرة (10 قطع)',price:1250,category:'meals',image:'https://images.unsplash.com/photo-1562967914-608f82629710?w=400&q=80',popular:false,order:20},
+    {id:21,name:'وجبة بروستد نص فروج',price:700,category:'meals',image:'https://images.unsplash.com/photo-1598103442097-8b74394b95c3?w=400&q=80',popular:false,order:21}
+  ],
+  meals:[
+    {id:1,name:'فراريج',image:'https://images.unsplash.com/photo-1598103442097-8b74394b95c3?w=200&q=80',items:[{name:'غاز',price:800},{name:'فحم',price:800}]},
+    {id:2,name:'الشاورما',image:'https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=200&q=80',items:[{name:'الوجبة العربي',price:650},{name:'التركية',price:650}]},
+    {id:3,name:'البروستد',image:'https://images.unsplash.com/photo-1598103442097-8b74394b95c3?w=200&q=80',items:[{name:'وجبة نص فروج',price:700},{name:'فروج كامل بروستد',price:1400}]},
+    {id:4,name:'كريسبي',image:'https://images.unsplash.com/photo-1562967914-608f82629710?w=200&q=80',items:[{name:'الكبيرة (10 قطع)',price:1250},{name:'الوسط (6 قطع)',price:900},{name:'الصغيرة (4 قطع)',price:700}]}
+  ],
+  grills:[
+    {id:1,name:'كفتة جاج',price:800,image:'https://images.unsplash.com/photo-1544025162-d76538ab0a65?w=400&q=80',popular:false},
+    {id:2,name:'كفتة لحمة',price:1900,image:'https://images.unsplash.com/photo-1528207776546-365bb710ee93?w=400&q=80',popular:false},
+    {id:3,name:'مشاوي مشكل',price:1800,image:'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&q=80',popular:true},
+    {id:4,name:'شقف',price:2400,image:'https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=400&q=80',popular:false},
+    {id:5,name:'طاووق',price:1300,image:'https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=400&q=80',popular:false}
+  ],
+  orders:[]
+};
+
+const CAT_NAMES = {sandwiches:'ساندويشات',shawarma:'شاورما',grills:'مشاوي',chicken:'فراريج',meals:'وجبات'};
+const STATUS_LABELS = {new:'جديد',preparing:'قيد التحضير',ready:'جاهز',delivered:'تم التسليم',cancelled:'ملغى'};
+const STATUS_COLORS = {new:'blue',preparing:'yellow',ready:'green',delivered:'gray',cancelled:'badge-red'};
+
+/* ════════════════════════════════════════════════
+   SUPABASE CONFIG
+════════════════════════════════════════════════ */
+const SB_URL = 'https://hnyzgeucabtpppyxnsel.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhueXpnZXVjYWJ0cHBweXhuc2VsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MDI3ODMsImV4cCI6MjA5NjA3ODc4M30.nv0BG6B01YRL4fAPoLuBol7b9dY67nJTRI6dVCy4dc0';
+const SB_HEADERS = { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}`, 'Content-Type': 'application/json' };
+
+/* Fetch data from Supabase — returns null on failure */
+async function fetchFromSupabase() {
+  try {
+    const res = await fetch(`${SB_URL}/rest/v1/site_data?id=eq.1&select=data`, { headers: SB_HEADERS });
+    const rows = await res.json();
+    return (rows[0]?.data && Object.keys(rows[0].data).length) ? rows[0].data : null;
+  } catch(e) { return null; }
+}
+
+/* Push data to Supabase */
+async function saveToSupabase(data) {
+  try {
+    await fetch(`${SB_URL}/rest/v1/site_data?id=eq.1`, {
+      method: 'PATCH',
+      headers: { ...SB_HEADERS, 'Prefer': 'return=minimal' },
+      body: JSON.stringify({ data, updated_at: new Date().toISOString() })
+    });
+  } catch(e) { console.warn('Supabase save failed — data kept in localStorage', e); }
+}
+
+/* ════════════════════════════════════════════════
+   DATA MANAGEMENT
+════════════════════════════════════════════════ */
+function loadLocal() {
+  try {
+    const raw = localStorage.getItem('restaurantData');
+    if (!raw) return JSON.parse(JSON.stringify(DEFAULTS));
+    return Object.assign({}, JSON.parse(JSON.stringify(DEFAULTS)), JSON.parse(raw));
+  } catch(e) { return JSON.parse(JSON.stringify(DEFAULTS)); }
+}
+
+function saveLocal(data) {
+  localStorage.setItem('restaurantData', JSON.stringify(data));
+}
+
+function getData() { return window._siteData || (window._siteData = loadLocal()); }
+
+/* Save to localStorage immediately + sync to Supabase in background */
+function persist() {
+  saveLocal(window._siteData);
+  saveToSupabase(window._siteData); /* async — runs in background */
+}
+
+/* ════════════════════════════════════════════════
+   AUTH
+════════════════════════════════════════════════ */
+async function doLogin() {
+  const user = document.getElementById('loginUser').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  const btn  = document.querySelector('.btn-login');
+
+  /* Show loading state on button */
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحقق...';
+  btn.disabled = true;
+
+  /* Load latest credentials from Supabase (or local fallback) */
+  const remote = await fetchFromSupabase();
+  const d = remote
+    ? Object.assign({}, JSON.parse(JSON.stringify(DEFAULTS)), remote)
+    : loadLocal();
+
+  btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> دخول';
+  btn.disabled = false;
+
+  if (user === d.credentials.username && pass === d.credentials.password) {
+    window._siteData = d;
+    saveLocal(d);
+    sessionStorage.setItem('adminLoggedIn', user);
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'block';
+    document.getElementById('adminName').textContent = user;
+    document.getElementById('adminInitial').textContent = user[0].toUpperCase();
+    initDashboard();
+  } else {
+    document.getElementById('loginError').style.display = 'flex';
+  }
+}
+
+function doLogout() {
+  sessionStorage.removeItem('adminLoggedIn');
+  location.reload();
+}
+
+// Allow Enter key on login
+document.getElementById('loginPass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
+document.getElementById('loginUser').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('loginPass').focus(); });
+
+/* ════════════════════════════════════════════════
+   NAVIGATION
+════════════════════════════════════════════════ */
+const PAGE_TITLES = {
+  overview:'لوحة التحكم', menu:'إدارة المنيو', meals:'إدارة الوجبات',
+  grills:'إدارة المشاوي', content:'تعديل النصوص', design:'إعدادات التصميم',
+  contact:'معلومات التواصل', media:'مكتبة الصور', orders:'الطلبات', settings:'الإعدادات'
+};
+
+function showPage(id, btn) {
+  document.querySelectorAll('.dash-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  document.getElementById('topbarTitle').textContent = PAGE_TITLES[id] || id;
+  closeSidebar();
+  // Lazy render each section
+  const renderers = {
+    overview: renderOverview, menu: renderMenuTable, meals: renderMeals,
+    grills: renderGrills, content: renderContent, design: renderDesign,
+    contact: renderContact, media: renderMedia, orders: renderOrders,
+    settings: renderSettings
+  };
+  if (renderers[id]) renderers[id]();
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+}
+
+/* ════════════════════════════════════════════════
+   INIT
+════════════════════════════════════════════════ */
+async function initDashboard() {
+  /* Show loading spinner while fetching from Supabase */
+  document.getElementById('statsGrid').innerHTML = `
+    <div style="grid-column:1/-1;text-align:center;padding:50px;color:var(--muted)">
+      <i class="fas fa-spinner fa-spin" style="font-size:28px;color:var(--red)"></i>
+      <p style="margin-top:12px;font-weight:700">جاري تحميل البيانات...</p>
+    </div>`;
+
+  /* Try Supabase first, fall back to localStorage */
+  const remote = await fetchFromSupabase();
+  if (remote) {
+    window._siteData = Object.assign({}, JSON.parse(JSON.stringify(DEFAULTS)), remote);
+    saveLocal(window._siteData); /* update local cache */
+  } else {
+    window._siteData = loadLocal();
+  }
+
+  updateOrdersBadge();
+  renderOverview();
+}
+
+function updateOrdersBadge() {
+  const count = getData().orders.filter(o => o.status === 'new').length;
+  document.getElementById('ordersCount').textContent = count;
+  document.getElementById('ordersCount').style.display = count ? 'inline' : 'none';
+}
+
+/* ════════════════════════════════════════════════
+   OVERVIEW
+════════════════════════════════════════════════ */
+function renderOverview() {
+  const d = getData();
+  const totalItems = d.menuItems.length;
+  const totalOrders = d.orders.length;
+  const newOrders = d.orders.filter(o => o.status==='new').length;
+  const totalMeals = d.meals.reduce((s,m) => s+m.items.length, 0);
+
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card"><div class="stat-icon red"><i class="fas fa-utensils"></i></div><div><div class="stat-num">${totalItems}</div><div class="stat-lbl">عنصر في المنيو</div></div></div>
+    <div class="stat-card"><div class="stat-icon green"><i class="fas fa-shopping-bag"></i></div><div><div class="stat-num">${totalOrders}</div><div class="stat-lbl">إجمالي الطلبات</div></div></div>
+    <div class="stat-card"><div class="stat-icon gold"><i class="fas fa-bell"></i></div><div><div class="stat-num">${newOrders}</div><div class="stat-lbl">طلبات جديدة</div></div></div>
+    <div class="stat-card"><div class="stat-icon blue"><i class="fas fa-bowl-food"></i></div><div><div class="stat-num">${totalMeals}</div><div class="stat-lbl">وجبة متاحة</div></div></div>
+  `;
+
+  // Recent orders + popular items
+  const recentOrders = [...d.orders].reverse().slice(0,5);
+  const popularItems = d.menuItems.filter(i=>i.popular).slice(0,5);
+
+  document.getElementById('overviewCards').innerHTML = `
+    <div class="card">
+      <div class="card-head"><h3><i class="fas fa-clock" style="color:var(--red)"></i> آخر الطلبات</h3></div>
+      <div class="card-body">
+        ${recentOrders.length ? recentOrders.map(o=>`
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)">
+            <div>
+              <div style="font-size:13px;font-weight:700">${o.name}</div>
+              <div style="font-size:11px;color:var(--muted)">${o.phone} • ${new Date(o.date).toLocaleDateString('ar')}</div>
+            </div>
+            <span class="badge badge-${STATUS_COLORS[o.status]||'gray'}">${STATUS_LABELS[o.status]||o.status}</span>
+          </div>`).join('') : '<div class="empty-state"><i class="fas fa-inbox"></i><p>لا توجد طلبات بعد</p></div>'}
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3><i class="fas fa-star" style="color:var(--gold)"></i> الأصناف المميزة</h3></div>
+      <div class="card-body">
+        ${popularItems.length ? popularItems.map(item=>`
+          <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border)">
+            <img src="${item.image}" style="width:40px;height:40px;object-fit:cover;border-radius:8px" onerror="this.src='https://via.placeholder.com/40'"/>
+            <div style="flex:1">
+              <div style="font-size:13px;font-weight:700">${item.name}</div>
+              <div style="font-size:11px;color:var(--muted)">${CAT_NAMES[item.category]||item.category}</div>
+            </div>
+            <span style="font-weight:800;color:var(--gold)">${item.price.toLocaleString()} ل.ل</span>
+          </div>`).join('') : '<div class="empty-state"><i class="fas fa-star"></i><p>لا توجد أصناف مميزة</p></div>'}
+      </div>
+    </div>
+  `;
+}
+
+/* ════════════════════════════════════════════════
+   MENU MANAGEMENT
+════════════════════════════════════════════════ */
+function renderMenuTable() {
+  const d = getData();
+  const search = (document.getElementById('menuSearch')?.value||'').toLowerCase();
+  const catF = document.getElementById('menuCatFilter')?.value||'';
+  let items = d.menuItems.filter(i =>
+    (!search || i.name.includes(search)) &&
+    (!catF || i.category === catF)
+  ).sort((a,b) => a.order - b.order);
+
+  document.getElementById('menuTbody').innerHTML = items.length ? items.map(item => `
+    <tr>
+      <td><img class="td-img" src="${item.image}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/50'"/></td>
+      <td style="font-weight:700">${item.name}</td>
+      <td><span style="font-weight:800;color:var(--gold)">${item.price.toLocaleString()} ل.ل</span></td>
+      <td><span class="badge badge-blue">${CAT_NAMES[item.category]||item.category}</span></td>
+      <td>
+        <label class="toggle">
+          <input type="checkbox" ${item.popular?'checked':''} onchange="toggleMenuPopular(${item.id})"/>
+          <span class="toggle-slider"></span>
+        </label>
+      </td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-sm btn-secondary" onclick="moveMenuItem(${item.id},-1)" title="لأعلى"><i class="fas fa-arrow-up"></i></button>
+          <button class="btn btn-sm btn-secondary" onclick="moveMenuItem(${item.id},1)" title="لأسفل"><i class="fas fa-arrow-down"></i></button>
+        </div>
+      </td>
+      <td>
+        <div class="td-actions">
+          <button class="btn btn-sm btn-info" onclick="openMenuModal(${item.id})"><i class="fas fa-pen"></i></button>
+          <button class="btn btn-sm btn-danger" onclick="deleteMenuItem(${item.id})"><i class="fas fa-trash"></i></button>
+        </div>
+      </td>
+    </tr>`).join('') : '<tr><td colspan="7"><div class="empty-state"><i class="fas fa-search"></i><p>لا توجد نتائج</p></div></td></tr>';
+}
+
+function openMenuModal(id) {
+  const d = getData();
+  const item = id ? d.menuItems.find(i=>i.id===id) : null;
+  const title = item ? 'تعديل الصنف' : 'إضافة صنف جديد';
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalBody').innerHTML = `
+    <div class="form-row">
+      <div class="form-group">
+        <label>اسم الصنف *</label>
+        <input class="form-control" id="mi_name" value="${item?item.name:''}" placeholder="مثال: شاورما كبير"/>
+      </div>
+      <div class="form-group">
+        <label>السعر (ل.ل) *</label>
+        <input class="form-control" id="mi_price" type="number" value="${item?item.price:''}" placeholder="400"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>التصنيف *</label>
+      <select class="form-control" id="mi_cat">
+        ${Object.entries(CAT_NAMES).map(([v,l])=>`<option value="${v}"${item&&item.category===v?' selected':''}>${l}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group">
+      <label>رابط الصورة *</label>
+      <input class="form-control" id="mi_img" value="${item?item.image:''}" placeholder="https://..." oninput="previewImg('mi_img','mi_preview')"/>
+      <img id="mi_preview" class="img-preview" src="${item?item.image:''}" onerror="this.style.display='none'" style="${item?'':'display:none'}"/>
+    </div>
+    <div class="form-group">
+      <label style="display:flex;align-items:center;gap:10px">
+        <label class="toggle"><input type="checkbox" id="mi_pop" ${item&&item.popular?'checked':''}><span class="toggle-slider"></span></label>
+        مميز (⭐ الأكثر طلباً)
+      </label>
+    </div>
+  `;
+  document.getElementById('modalFooter').innerHTML = `
+    <button class="btn btn-primary" onclick="saveMenuItem(${id||0})"><i class="fas fa-save"></i> حفظ</button>
+    <button class="btn btn-secondary" onclick="closeModal()">إلغاء</button>
+  `;
+  openModal();
+}
+
+function saveMenuItem(id) {
+  const name = document.getElementById('mi_name').value.trim();
+  const price = parseInt(document.getElementById('mi_price').value);
+  const cat = document.getElementById('mi_cat').value;
+  const img = document.getElementById('mi_img').value.trim();
+  const pop = document.getElementById('mi_pop').checked;
+  if (!name || !price || !img) { toast('الرجاء تعبئة جميع الحقول المطلوبة','error'); return; }
+  const d = getData();
+  if (id) {
+    const i = d.menuItems.findIndex(x=>x.id===id);
+    if (i>=0) Object.assign(d.menuItems[i], {name,price,category:cat,image:img,popular:pop});
+  } else {
+    const maxId = d.menuItems.reduce((m,x)=>Math.max(m,x.id),0);
+    const maxOrd = d.menuItems.reduce((m,x)=>Math.max(m,x.order),0);
+    d.menuItems.push({id:maxId+1,name,price,category:cat,image:img,popular:pop,order:maxOrd+1});
+  }
+  persist();
+  closeModal();
+  renderMenuTable();
+  renderOverview();
+  toast(id?'تم تعديل الصنف':'تمت إضافة الصنف','success');
+}
+
+function deleteMenuItem(id) {
+  confirm_('حذف هذا الصنف من المنيو؟', () => {
+    const d = getData();
+    d.menuItems = d.menuItems.filter(i=>i.id!==id);
+    persist(); renderMenuTable(); renderOverview();
+    toast('تم حذف الصنف','success');
+  });
+}
+
+function toggleMenuPopular(id) {
+  const d = getData();
+  const i = d.menuItems.findIndex(x=>x.id===id);
+  if (i>=0) d.menuItems[i].popular = !d.menuItems[i].popular;
+  persist(); toast('تم التحديث','success');
+}
+
+function moveMenuItem(id, dir) {
+  const d = getData();
+  const sorted = [...d.menuItems].sort((a,b)=>a.order-b.order);
+  const idx = sorted.findIndex(i=>i.id===id);
+  const swapIdx = idx + dir;
+  if (swapIdx < 0 || swapIdx >= sorted.length) return;
+  const tmp = sorted[idx].order;
+  sorted[idx].order = sorted[swapIdx].order;
+  sorted[swapIdx].order = tmp;
+  persist(); renderMenuTable();
+}
+
+/* ════════════════════════════════════════════════
+   MEALS MANAGEMENT
+════════════════════════════════════════════════ */
+function renderMeals() {
+  const d = getData();
+  document.getElementById('mealsEditor').innerHTML = d.meals.map(meal => `
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-head">
+        <h3 style="display:flex;align-items:center;gap:10px">
+          <img src="${meal.image}" style="width:40px;height:40px;object-fit:cover;border-radius:8px" onerror="this.style.display='none'"/>
+          ${meal.name}
+        </h3>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-sm btn-info" onclick="openMealModal(${meal.id})"><i class="fas fa-pen"></i> تعديل</button>
+          <button class="btn btn-sm btn-primary" onclick="openMealItemModal(${meal.id})"><i class="fas fa-plus"></i> إضافة عنصر</button>
+          <button class="btn btn-sm btn-danger" onclick="deleteMeal(${meal.id})"><i class="fas fa-trash"></i></button>
+        </div>
+      </div>
+      <div class="card-body">
+        ${meal.items.map((item,idx) => `
+          <div class="meal-item-row">
+            <span class="meal-name">${item.name}</span>
+            <span class="meal-price">${item.price.toLocaleString()} ل.ل</span>
+            <button class="btn btn-sm btn-info" onclick="openMealItemModal(${meal.id},${idx})"><i class="fas fa-pen"></i></button>
+            <button class="btn btn-sm btn-danger" onclick="deleteMealItem(${meal.id},${idx})"><i class="fas fa-trash"></i></button>
+          </div>`).join('')}
+        ${!meal.items.length ? '<div class="empty-state" style="padding:20px"><p>لا توجد عناصر</p></div>' : ''}
+      </div>
+    </div>`).join('') || '<div class="empty-state card"><i class="fas fa-bowl-food"></i><p>لا توجد وجبات</p></div>';
+}
+
+function openMealModal(id) {
+  const d = getData();
+  const meal = id ? d.meals.find(m=>m.id===id) : null;
+  document.getElementById('modalTitle').textContent = meal ? 'تعديل فئة الوجبة' : 'إضافة فئة جديدة';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="form-group"><label>اسم الفئة *</label><input class="form-control" id="mel_name" value="${meal?meal.name:''}" placeholder="مثال: البروستد"/></div>
+    <div class="form-group">
+      <label>رابط الصورة</label>
+      <input class="form-control" id="mel_img" value="${meal?meal.image:''}" placeholder="https://..." oninput="previewImg('mel_img','mel_preview')"/>
+      <img id="mel_preview" class="img-preview" src="${meal?meal.image:''}" onerror="this.style.display='none'" style="${meal?'':'display:none'}"/>
+    </div>`;
+  document.getElementById('modalFooter').innerHTML = `
+    <button class="btn btn-primary" onclick="saveMeal(${id||0})"><i class="fas fa-save"></i> حفظ</button>
+    <button class="btn btn-secondary" onclick="closeModal()">إلغاء</button>`;
+  openModal();
+}
+
+function saveMeal(id) {
+  const name = document.getElementById('mel_name').value.trim();
+  const img = document.getElementById('mel_img').value.trim();
+  if (!name) { toast('أدخل اسم الفئة','error'); return; }
+  const d = getData();
+  if (id) {
+    const i = d.meals.findIndex(m=>m.id===id);
+    if (i>=0) { d.meals[i].name=name; if(img) d.meals[i].image=img; }
+  } else {
+    const maxId = d.meals.reduce((m,x)=>Math.max(m,x.id),0);
+    d.meals.push({id:maxId+1,name,image:img,items:[]});
+  }
+  persist(); closeModal(); renderMeals();
+  toast(id?'تم تعديل الفئة':'تمت إضافة الفئة','success');
+}
+
+function deleteMeal(id) {
+  confirm_('حذف هذه الفئة وجميع عناصرها؟', () => {
+    const d = getData(); d.meals = d.meals.filter(m=>m.id!==id);
+    persist(); renderMeals(); toast('تم الحذف','success');
+  });
+}
+
+function openMealItemModal(mealId, idx) {
+  const d = getData();
+  const meal = d.meals.find(m=>m.id===mealId);
+  const item = idx !== undefined ? meal.items[idx] : null;
+  document.getElementById('modalTitle').textContent = item ? 'تعديل العنصر' : 'إضافة عنصر';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="form-group"><label>الاسم *</label><input class="form-control" id="meli_name" value="${item?item.name:''}" placeholder="مثال: وجبة نص فروج"/></div>
+    <div class="form-group"><label>السعر (ل.ل) *</label><input class="form-control" id="meli_price" type="number" value="${item?item.price:''}" placeholder="700"/></div>`;
+  document.getElementById('modalFooter').innerHTML = `
+    <button class="btn btn-primary" onclick="saveMealItem(${mealId},${idx!==undefined?idx:-1})"><i class="fas fa-save"></i> حفظ</button>
+    <button class="btn btn-secondary" onclick="closeModal()">إلغاء</button>`;
+  openModal();
+}
+
+function saveMealItem(mealId, idx) {
+  const name = document.getElementById('meli_name').value.trim();
+  const price = parseInt(document.getElementById('meli_price').value);
+  if (!name || !price) { toast('أكمل جميع الحقول','error'); return; }
+  const d = getData();
+  const meal = d.meals.find(m=>m.id===mealId);
+  if (idx >= 0) { meal.items[idx] = {name,price}; }
+  else { meal.items.push({name,price}); }
+  persist(); closeModal(); renderMeals();
+  toast('تم الحفظ','success');
+}
+
+function deleteMealItem(mealId, idx) {
+  confirm_('حذف هذا العنصر؟', () => {
+    const d = getData();
+    const meal = d.meals.find(m=>m.id===mealId);
+    meal.items.splice(idx,1);
+    persist(); renderMeals(); toast('تم الحذف','success');
+  });
+}
+
+/* ════════════════════════════════════════════════
+   GRILLS MANAGEMENT
+════════════════════════════════════════════════ */
+function renderGrills() {
+  const d = getData();
+  document.getElementById('grillsTbody').innerHTML = d.grills.length ? d.grills.map(g => `
+    <tr>
+      <td><img class="td-img" src="${g.image}" alt="${g.name}" onerror="this.src='https://via.placeholder.com/50'"/></td>
+      <td style="font-weight:700">${g.name}</td>
+      <td><span style="font-weight:800;color:var(--gold)">${g.price.toLocaleString()} ل.ل</span></td>
+      <td><label class="toggle"><input type="checkbox" ${g.popular?'checked':''} onchange="toggleGrillPopular(${g.id})"/><span class="toggle-slider"></span></label></td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-sm btn-secondary" onclick="moveGrill(${g.id},-1)"><i class="fas fa-arrow-up"></i></button>
+          <button class="btn btn-sm btn-secondary" onclick="moveGrill(${g.id},1)"><i class="fas fa-arrow-down"></i></button>
+        </div>
+      </td>
+      <td><div class="td-actions">
+        <button class="btn btn-sm btn-info" onclick="openGrillModal(${g.id})"><i class="fas fa-pen"></i></button>
+        <button class="btn btn-sm btn-danger" onclick="deleteGrill(${g.id})"><i class="fas fa-trash"></i></button>
+      </div></td>
+    </tr>`).join('') : '<tr><td colspan="6"><div class="empty-state"><i class="fas fa-fire"></i><p>لا توجد مشاوي</p></div></td></tr>';
+}
+
+function openGrillModal(id) {
+  const d = getData();
+  const g = id ? d.grills.find(x=>x.id===id) : null;
+  document.getElementById('modalTitle').textContent = g ? 'تعديل المشوي' : 'إضافة مشوي';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="form-row">
+      <div class="form-group"><label>الاسم *</label><input class="form-control" id="gr_name" value="${g?g.name:''}" placeholder="طاووق"/></div>
+      <div class="form-group"><label>السعر (ل.ل) *</label><input class="form-control" id="gr_price" type="number" value="${g?g.price:''}" placeholder="1300"/></div>
+    </div>
+    <div class="form-group">
+      <label>رابط الصورة *</label>
+      <input class="form-control" id="gr_img" value="${g?g.image:''}" placeholder="https://..." oninput="previewImg('gr_img','gr_preview')"/>
+      <img id="gr_preview" class="img-preview" src="${g?g.image:''}" onerror="this.style.display='none'" style="${g?'':'display:none'}"/>
+    </div>
+    <div class="form-group"><label style="display:flex;align-items:center;gap:10px"><label class="toggle"><input type="checkbox" id="gr_pop" ${g&&g.popular?'checked':''}><span class="toggle-slider"></span></label> مميز</label></div>`;
+  document.getElementById('modalFooter').innerHTML = `
+    <button class="btn btn-primary" onclick="saveGrill(${id||0})"><i class="fas fa-save"></i> حفظ</button>
+    <button class="btn btn-secondary" onclick="closeModal()">إلغاء</button>`;
+  openModal();
+}
+
+function saveGrill(id) {
+  const name = document.getElementById('gr_name').value.trim();
+  const price = parseInt(document.getElementById('gr_price').value);
+  const img = document.getElementById('gr_img').value.trim();
+  const pop = document.getElementById('gr_pop').checked;
+  if (!name || !price || !img) { toast('أكمل الحقول المطلوبة','error'); return; }
+  const d = getData();
+  if (id) {
+    const i = d.grills.findIndex(x=>x.id===id);
+    if (i>=0) Object.assign(d.grills[i],{name,price,image:img,popular:pop});
+  } else {
+    const maxId = d.grills.reduce((m,x)=>Math.max(m,x.id),0);
+    d.grills.push({id:maxId+1,name,price,image:img,popular:pop});
+  }
+  persist(); closeModal(); renderGrills();
+  toast(id?'تم التعديل':'تمت الإضافة','success');
+}
+
+function deleteGrill(id) {
+  confirm_('حذف هذا الصنف من المشاوي؟', () => {
+    const d = getData(); d.grills = d.grills.filter(g=>g.id!==id);
+    persist(); renderGrills(); toast('تم الحذف','success');
+  });
+}
+
+function toggleGrillPopular(id) {
+  const d = getData(); const i = d.grills.findIndex(x=>x.id===id);
+  if(i>=0) d.grills[i].popular=!d.grills[i].popular;
+  persist(); toast('تم التحديث','success');
+}
+
+function moveGrill(id, dir) {
+  const d = getData();
+  const idx = d.grills.findIndex(g=>g.id===id);
+  const swapIdx = idx+dir;
+  if (swapIdx<0||swapIdx>=d.grills.length) return;
+  [d.grills[idx],d.grills[swapIdx]] = [d.grills[swapIdx],d.grills[idx]];
+  persist(); renderGrills();
+}
+
+/* ════════════════════════════════════════════════
+   CONTENT MANAGEMENT
+════════════════════════════════════════════════ */
+function renderContent() {
+  const d = getData();
+  document.getElementById('contentEditor').innerHTML = `
+    <!-- Hero -->
+    <div class="content-section">
+      <div class="content-section-head" onclick="toggleSection('hero-body')">
+        <h4>🏠 قسم الهيرو (Hero)</h4><i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="content-section-body" id="hero-body">
+        <div class="form-row">
+          <div class="form-group"><label>العنوان الأول (ذهبي)</label><input class="form-control" id="c_title1" value="${d.hero.title1}"/></div>
+          <div class="form-group"><label>العنوان الثاني (أبيض)</label><input class="form-control" id="c_title2" value="${d.hero.title2}"/></div>
+        </div>
+        <div class="form-group"><label>نص الترحيب</label><input class="form-control" id="c_welcome" value="${d.hero.welcome}"/></div>
+        <div class="form-group"><label>الوصف</label><textarea class="form-control" id="c_desc">${d.hero.description}</textarea></div>
+        <div class="form-row">
+          <div class="form-group"><label>نص زر المنيو</label><input class="form-control" id="c_btnMenu" value="${d.hero.btnMenu}"/></div>
+          <div class="form-group"><label>نص زر الطلب</label><input class="form-control" id="c_btnOrder" value="${d.hero.btnOrder}"/></div>
+        </div>
+        <div class="form-group"><label>صورة الهيرو 1</label><input class="form-control" id="c_img1" value="${d.hero.img1}" oninput="previewImg('c_img1','prev_img1')"/><img id="prev_img1" class="img-preview" src="${d.hero.img1}" onerror="this.style.display='none'"/></div>
+        <div class="form-group"><label>صورة الهيرو 2</label><input class="form-control" id="c_img2" value="${d.hero.img2}" oninput="previewImg('c_img2','prev_img2')"/><img id="prev_img2" class="img-preview" src="${d.hero.img2}" onerror="this.style.display='none'"/></div>
+        <div class="form-group"><label>صورة الهيرو 3</label><input class="form-control" id="c_img3" value="${d.hero.img3}" oninput="previewImg('c_img3','prev_img3')"/><img id="prev_img3" class="img-preview" src="${d.hero.img3}" onerror="this.style.display='none'"/></div>
+      </div>
+    </div>
+
+    <!-- Navbar -->
+    <div class="content-section">
+      <div class="content-section-head" onclick="toggleSection('nav-body')"><h4>🔝 شريط التنقل</h4><i class="fas fa-chevron-down"></i></div>
+      <div class="content-section-body" id="nav-body">
+        <div class="form-row">
+          <div class="form-group"><label>اسم المطعم (سطر 1)</label><input class="form-control" id="c_logo1" value="${d.navbar.logo1}"/></div>
+          <div class="form-group"><label>اسم المطعم (سطر 2)</label><input class="form-control" id="c_logo2" value="${d.navbar.logo2}"/></div>
+        </div>
+        <div class="form-group"><label>نص زر الطلب</label><input class="form-control" id="c_navCta" value="${d.navbar.cta}"/></div>
+      </div>
+    </div>
+
+    <!-- About -->
+    <div class="content-section">
+      <div class="content-section-head" onclick="toggleSection('about-body')"><h4>ℹ️ قسم عن المطعم</h4><i class="fas fa-chevron-down"></i></div>
+      <div class="content-section-body" id="about-body">
+        <div class="form-group"><label>عنوان القسم</label><input class="form-control" id="c_abTitle" value="${d.about.title}"/></div>
+        <div class="form-group"><label>الفقرة الأولى</label><textarea class="form-control" id="c_abP1">${d.about.p1}</textarea></div>
+        <div class="form-group"><label>الفقرة الثانية</label><textarea class="form-control" id="c_abP2">${d.about.p2}</textarea></div>
+        <div class="form-group"><label>صورة القسم</label><input class="form-control" id="c_abImg" value="${d.about.img}" oninput="previewImg('c_abImg','prev_abImg')"/><img id="prev_abImg" class="img-preview" src="${d.about.img}" onerror="this.style.display='none'"/></div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+          <div><div class="form-group"><label>إحصاء 1 (رقم)</label><input class="form-control" id="c_s1n" value="${d.about.stat1}"/></div><div class="form-group"><label>الوصف</label><input class="form-control" id="c_s1l" value="${d.about.stat1L}"/></div></div>
+          <div><div class="form-group"><label>إحصاء 2 (رقم)</label><input class="form-control" id="c_s2n" value="${d.about.stat2}"/></div><div class="form-group"><label>الوصف</label><input class="form-control" id="c_s2l" value="${d.about.stat2L}"/></div></div>
+          <div><div class="form-group"><label>إحصاء 3 (رقم)</label><input class="form-control" id="c_s3n" value="${d.about.stat3}"/></div><div class="form-group"><label>الوصف</label><input class="form-control" id="c_s3l" value="${d.about.stat3L}"/></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Features -->
+    <div class="content-section">
+      <div class="content-section-head" onclick="toggleSection('feat-body')"><h4>✨ قسم المميزات</h4><i class="fas fa-chevron-down"></i></div>
+      <div class="content-section-body" id="feat-body">
+        ${d.features.map((f,i)=>`
+          <div style="background:#f8fafc;border-radius:10px;padding:14px;margin-bottom:12px;border:1px solid var(--border)">
+            <div class="form-row">
+              <div class="form-group"><label>الأيقونة</label><input class="form-control" id="c_fi${i}" value="${f.icon}" style="font-size:18px"/></div>
+              <div class="form-group"><label>العنوان</label><input class="form-control" id="c_ft${i}" value="${f.title}"/></div>
+            </div>
+            <div class="form-group"><label>الوصف</label><input class="form-control" id="c_fd${i}" value="${f.desc}"/></div>
+          </div>`).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function saveContent() {
+  const d = getData();
+  // Hero
+  d.hero.title1 = document.getElementById('c_title1')?.value||d.hero.title1;
+  d.hero.title2 = document.getElementById('c_title2')?.value||d.hero.title2;
+  d.hero.welcome = document.getElementById('c_welcome')?.value||d.hero.welcome;
+  d.hero.description = document.getElementById('c_desc')?.value||d.hero.description;
+  d.hero.btnMenu = document.getElementById('c_btnMenu')?.value||d.hero.btnMenu;
+  d.hero.btnOrder = document.getElementById('c_btnOrder')?.value||d.hero.btnOrder;
+  d.hero.img1 = document.getElementById('c_img1')?.value||d.hero.img1;
+  d.hero.img2 = document.getElementById('c_img2')?.value||d.hero.img2;
+  d.hero.img3 = document.getElementById('c_img3')?.value||d.hero.img3;
+  // Navbar
+  d.navbar.logo1 = document.getElementById('c_logo1')?.value||d.navbar.logo1;
+  d.navbar.logo2 = document.getElementById('c_logo2')?.value||d.navbar.logo2;
+  d.navbar.cta = document.getElementById('c_navCta')?.value||d.navbar.cta;
+  // About
+  d.about.title = document.getElementById('c_abTitle')?.value||d.about.title;
+  d.about.p1 = document.getElementById('c_abP1')?.value||d.about.p1;
+  d.about.p2 = document.getElementById('c_abP2')?.value||d.about.p2;
+  d.about.img = document.getElementById('c_abImg')?.value||d.about.img;
+  d.about.stat1 = document.getElementById('c_s1n')?.value||d.about.stat1;
+  d.about.stat1L = document.getElementById('c_s1l')?.value||d.about.stat1L;
+  d.about.stat2 = document.getElementById('c_s2n')?.value||d.about.stat2;
+  d.about.stat2L = document.getElementById('c_s2l')?.value||d.about.stat2L;
+  d.about.stat3 = document.getElementById('c_s3n')?.value||d.about.stat3;
+  d.about.stat3L = document.getElementById('c_s3l')?.value||d.about.stat3L;
+  // Features
+  d.features.forEach((f,i) => {
+    f.icon = document.getElementById(`c_fi${i}`)?.value||f.icon;
+    f.title = document.getElementById(`c_ft${i}`)?.value||f.title;
+    f.desc = document.getElementById(`c_fd${i}`)?.value||f.desc;
+  });
+  persist();
+  toast('تم حفظ جميع التغييرات ✓','success');
+}
+
+/* ════════════════════════════════════════════════
+   DESIGN SETTINGS
+════════════════════════════════════════════════ */
+function renderDesign() {
+  const d = getData();
+  document.getElementById('designEditor').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div class="card">
+        <div class="card-head"><h3>🎨 الألوان الرئيسية</h3></div>
+        <div class="card-body">
+          <div class="form-group">
+            <label>اللون الأحمر (الرئيسي)</label>
+            <div class="color-row">
+              <input type="color" id="d_primary" value="${d.design.primary}" oninput="liveColor('d_primary','dp_preview')"/>
+              <input class="form-control" id="dp_hex" value="${d.design.primary}" oninput="syncColorHex('dp_hex','d_primary')"/>
+            </div>
+            <div id="dp_preview" style="height:8px;border-radius:4px;background:${d.design.primary};margin-top:8px;transition:background .2s"></div>
+          </div>
+          <div class="form-group">
+            <label>اللون الذهبي (التمييز)</label>
+            <div class="color-row">
+              <input type="color" id="d_accent" value="${d.design.accent}" oninput="liveColor('d_accent','da_preview')"/>
+              <input class="form-control" id="da_hex" value="${d.design.accent}" oninput="syncColorHex('da_hex','d_accent')"/>
+            </div>
+            <div id="da_preview" style="height:8px;border-radius:4px;background:${d.design.accent};margin-top:8px;transition:background .2s"></div>
+          </div>
+          <div class="form-group">
+            <label>لون الخلفية الداكنة</label>
+            <div class="color-row">
+              <input type="color" id="d_dark" value="${d.design.dark}" oninput="liveColor('d_dark','dd_preview')"/>
+              <input class="form-control" id="dd_hex" value="${d.design.dark}" oninput="syncColorHex('dd_hex','d_dark')"/>
+            </div>
+            <div id="dd_preview" style="height:8px;border-radius:4px;background:${d.design.dark};margin-top:8px;transition:background .2s"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>👁️ معاينة الألوان</h3></div>
+        <div class="card-body">
+          <div style="border-radius:12px;overflow:hidden;box-shadow:var(--sh)">
+            <div id="prev_navbar" style="background:${d.design.dark};padding:12px 16px;display:flex;align-items:center;justify-content:space-between">
+              <div style="color:#fff;font-weight:900;font-size:14px">${d.navbar.logo2}</div>
+              <div id="prev_navbtn" style="background:${d.design.primary};color:#fff;padding:6px 14px;border-radius:7px;font-size:12px;font-weight:700">${d.navbar.cta}</div>
+            </div>
+            <div id="prev_hero" style="background:${d.design.dark};padding:28px 16px;text-align:center">
+              <div style="font-size:20px;font-weight:900;color:${d.design.accent}">${d.hero.title1}</div>
+              <div style="font-size:22px;font-weight:900;color:#fff">${d.hero.title2}</div>
+              <div id="prev_btn" style="display:inline-block;background:${d.design.primary};color:#fff;padding:10px 20px;border-radius:9px;font-size:13px;font-weight:700;margin-top:12px">${d.hero.btnMenu}</div>
+            </div>
+            <div style="background:#fff;padding:16px;display:flex;gap:10px">
+              <div id="prev_price" style="font-weight:900;color:${d.design.accent};font-size:15px">400 ل.ل</div>
+              <div style="color:#666;font-size:13px;flex:1">سمون برغر</div>
+            </div>
+          </div>
+          <p style="font-size:12px;color:var(--muted);margin-top:12px;text-align:center">تحديث مباشر — اضغط "حفظ وتطبيق" لحفظ التغييرات</p>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function liveColor(colorId, previewId) {
+  const val = document.getElementById(colorId).value;
+  const hexId = colorId.replace('d_','d').replace('_','')+'_hex';
+  if(document.getElementById(hexId)) document.getElementById(hexId).value = val;
+  if(document.getElementById(previewId)) document.getElementById(previewId).style.background = val;
+  // Update live preview
+  const d = getData();
+  if(colorId==='d_primary'){
+    document.getElementById('prev_navbtn')&&(document.getElementById('prev_navbtn').style.background=val);
+    document.getElementById('prev_btn')&&(document.getElementById('prev_btn').style.background=val);
+  }
+  if(colorId==='d_accent'){
+    document.getElementById('prev_price')&&(document.getElementById('prev_price').style.color=val);
+    document.querySelector('#prev_hero > div')&&(document.querySelector('#prev_hero > div').style.color=val);
+  }
+  if(colorId==='d_dark'){
+    document.getElementById('prev_navbar')&&(document.getElementById('prev_navbar').style.background=val);
+    document.getElementById('prev_hero')&&(document.getElementById('prev_hero').style.background=val);
+  }
+}
+
+function syncColorHex(hexInputId, colorId) {
+  const val = document.getElementById(hexInputId).value;
+  if(/^#[0-9A-Fa-f]{6}$/.test(val)) {
+    document.getElementById(colorId).value = val;
+    liveColor(colorId, colorId.replace('d_','d').replace('_','')+'_preview');
+  }
+}
+
+function saveDesign() {
+  const d = getData();
+  d.design.primary = document.getElementById('d_primary')?.value||d.design.primary;
+  d.design.accent = document.getElementById('d_accent')?.value||d.design.accent;
+  d.design.dark = document.getElementById('d_dark')?.value||d.design.dark;
+  persist();
+  toast('تم حفظ إعدادات التصميم وسيتم تطبيقها على الموقع ✓','success');
+}
+
+/* ════════════════════════════════════════════════
+   CONTACT MANAGEMENT
+════════════════════════════════════════════════ */
+function renderContact() {
+  const d = getData();
+  document.getElementById('contactEditor').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div class="card">
+        <div class="card-head"><h3>📞 معلومات الاتصال</h3></div>
+        <div class="card-body">
+          <div class="form-group"><label>رقم الهاتف</label><input class="form-control" id="ct_phone" value="${d.contact.phone}" placeholder="+961 3 280 613"/></div>
+          <div class="form-group"><label>رقم واتساب (بدون +)</label><input class="form-control" id="ct_wa" value="${d.contact.whatsapp}" placeholder="9613280613"/></div>
+          <div class="form-group"><label>العنوان (السطر 1)</label><input class="form-control" id="ct_addr1" value="${d.contact.address1}"/></div>
+          <div class="form-group"><label>العنوان (السطر 2)</label><input class="form-control" id="ct_addr2" value="${d.contact.address2}"/></div>
+          <div class="form-group"><label>ساعات العمل (من)</label><input class="form-control" id="ct_h1" value="${d.contact.hoursFrom}"/></div>
+          <div class="form-group"><label>ساعات العمل (حتى)</label><input class="form-control" id="ct_h2" value="${d.contact.hoursTo}"/></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>📋 معاينة</h3></div>
+        <div class="card-body">
+          <div style="background:#1a1f36;border-radius:12px;padding:20px;color:#fff">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><i class="fas fa-phone" style="color:#e8a020"></i><span>${d.contact.phone}</span></div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><i class="fab fa-whatsapp" style="color:#25d366"></i><span>wa.me/${d.contact.whatsapp}</span></div>
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px"><i class="fas fa-map-marker-alt" style="color:#c8102e"></i><span>${d.contact.address1} — ${d.contact.address2}</span></div>
+            <div style="display:flex;align-items:center;gap:8px"><i class="fas fa-clock" style="color:#e8a020"></i><span>${d.contact.hoursFrom} ${d.contact.hoursTo}</span></div>
+          </div>
+          <p style="font-size:12px;color:var(--muted);margin-top:12px">كل روابط واتساب على الموقع ستتحدث تلقائياً عند الحفظ</p>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function saveContact() {
+  const d = getData();
+  d.contact.phone = document.getElementById('ct_phone').value.trim();
+  d.contact.whatsapp = document.getElementById('ct_wa').value.trim().replace(/[^0-9]/g,'');
+  d.contact.address1 = document.getElementById('ct_addr1').value.trim();
+  d.contact.address2 = document.getElementById('ct_addr2').value.trim();
+  d.contact.hoursFrom = document.getElementById('ct_h1').value.trim();
+  d.contact.hoursTo = document.getElementById('ct_h2').value.trim();
+  persist();
+  renderContact();
+  toast('تم حفظ معلومات التواصل ✓','success');
+}
+
+/* ════════════════════════════════════════════════
+   MEDIA LIBRARY
+════════════════════════════════════════════════ */
+function renderMedia() {
+  const d = getData();
+  // Collect all images from all sections
+  const images = [];
+  const addImg = (url, label) => url && images.push({url,label});
+  addImg(d.hero.img1,'هيرو - صورة 1'); addImg(d.hero.img2,'هيرو - صورة 2'); addImg(d.hero.img3,'هيرو - صورة 3');
+  addImg(d.about.img,'قسم عن المطعم');
+  d.menuItems.forEach(i => addImg(i.image, `منيو: ${i.name}`));
+  d.grills.forEach(g => addImg(g.image, `مشاوي: ${g.name}`));
+  d.meals.forEach(m => addImg(m.image, `وجبات: ${m.name}`));
+
+  document.getElementById('mediaEditor').innerHTML = `
+    <div class="card" style="margin-bottom:20px">
+      <div class="card-head"><h3>➕ إضافة / تغيير صورة بالرابط</h3></div>
+      <div class="card-body">
+        <div class="form-row">
+          <div class="form-group">
+            <label>رابط الصورة</label>
+            <input class="form-control" id="media_url" placeholder="https://images.unsplash.com/..." oninput="previewImg('media_url','media_preview')"/>
+          </div>
+          <div class="form-group" style="display:flex;flex-direction:column;justify-content:flex-end">
+            <img id="media_preview" class="img-preview" src="" onerror="this.style.display='none'" style="display:none"/>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--muted)">لتغيير صورة عنصر معين، اذهب إلى المنيو أو المشاوي وعدّل الصنف مباشرة.</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><h3>🖼️ جميع صور الموقع (${images.length})</h3></div>
+      <div class="card-body">
+        <div class="media-grid">
+          ${images.map(img=>`
+            <div class="media-item">
+              <img src="${img.url}" alt="${img.label}" onerror="this.src='https://via.placeholder.com/140x110?text=Error'" loading="lazy"/>
+              <div class="media-item-body">
+                <div class="media-item-name">${img.label}</div>
+              </div>
+            </div>`).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* ════════════════════════════════════════════════
+   ORDERS MANAGEMENT
+════════════════════════════════════════════════ */
+function renderOrders() {
+  const d = getData();
+  const el = document.getElementById('ordersEditor');
+  if (!d.orders.length) {
+    el.innerHTML = `<div class="card"><div class="empty-state" style="padding:60px"><i class="fas fa-shopping-bag"></i><p>لا توجد طلبات بعد</p><p style="font-size:12px;margin-top:8px">ستظهر الطلبات هنا عند وصولها من الموقع</p></div></div>`;
+    return;
+  }
+  el.innerHTML = [...d.orders].reverse().map(o=>`
+    <div class="order-row">
+      <div class="order-info">
+        <div class="order-id">#${o.id} • ${new Date(o.date).toLocaleString('ar')}</div>
+        <div class="order-name">${o.name}</div>
+        <div class="order-items">${o.phone} ${o.address?'• '+o.address:''}</div>
+        ${o.items?`<div style="font-size:12px;color:var(--muted);margin-top:4px">${o.items}</div>`:''}
+      </div>
+      <div class="order-price">${(o.total||0).toLocaleString()} ل.ل</div>
+      <div>
+        <select class="form-control" style="width:130px;font-size:12px" onchange="updateOrderStatus(${o.id},this.value)">
+          ${Object.entries(STATUS_LABELS).map(([v,l])=>`<option value="${v}"${o.status===v?' selected':''}>${l}</option>`).join('')}
+        </select>
+      </div>
+      <button class="btn btn-sm btn-danger" onclick="deleteOrder(${o.id})"><i class="fas fa-trash"></i></button>
+    </div>`).join('');
+}
+
+function updateOrderStatus(id, status) {
+  const d = getData(); const o = d.orders.find(x=>x.id===id);
+  if(o) { o.status=status; persist(); updateOrdersBadge(); toast('تم تحديث حالة الطلب','success'); }
+}
+
+function deleteOrder(id) {
+  confirm_('حذف هذا الطلب؟', () => {
+    const d = getData(); d.orders=d.orders.filter(o=>o.id!==id);
+    persist(); renderOrders(); updateOrdersBadge(); toast('تم حذف الطلب','success');
+  });
+}
+
+function clearOrders() {
+  confirm_('حذف جميع الطلبات؟', () => {
+    const d = getData(); d.orders=[];
+    persist(); renderOrders(); updateOrdersBadge(); toast('تم مسح جميع الطلبات','success');
+  });
+}
+
+/* ════════════════════════════════════════════════
+   SETTINGS
+════════════════════════════════════════════════ */
+function renderSettings() {
+  const d = getData();
+  document.getElementById('settingsEditor').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <!-- Change password -->
+      <div class="card">
+        <div class="card-head"><h3>🔐 تغيير كلمة المرور</h3></div>
+        <div class="card-body">
+          <div class="form-group"><label>اسم المستخدم</label><input class="form-control" id="set_user" value="${d.credentials.username}"/></div>
+          <div class="form-group"><label>كلمة المرور الجديدة</label><input class="form-control" type="password" id="set_pass" placeholder="أدخل كلمة مرور جديدة"/></div>
+          <div class="form-group"><label>تأكيد كلمة المرور</label><input class="form-control" type="password" id="set_pass2" placeholder="أعد الكتابة"/></div>
+          <button class="btn btn-primary" onclick="savePassword()"><i class="fas fa-save"></i> حفظ بيانات الدخول</button>
+        </div>
+      </div>
+      <!-- Export / Import -->
+      <div class="card">
+        <div class="card-head"><h3>💾 نسخ احتياطي واستعادة</h3></div>
+        <div class="card-body">
+          <p style="font-size:13px;color:var(--muted);margin-bottom:16px">احتفظ بنسخة من بيانات الموقع أو استعد بيانات سابقة.</p>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <button class="btn btn-success" onclick="exportData()"><i class="fas fa-download"></i> تصدير البيانات (JSON)</button>
+            <label class="btn btn-info" style="cursor:pointer"><i class="fas fa-upload"></i> استيراد بيانات<input type="file" accept=".json" style="display:none" onchange="importData(event)"/></label>
+            <button class="btn btn-danger" onclick="resetData()"><i class="fas fa-rotate-left"></i> إعادة ضبط المصنع</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:20px">
+      <div class="card-head"><h3>ℹ️ معلومات النظام</h3></div>
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;font-size:13px">
+          <div><b>الإصدار:</b> ${d.version}</div>
+          <div><b>عناصر المنيو:</b> ${d.menuItems.length}</div>
+          <div><b>الطلبات:</b> ${d.orders.length}</div>
+          <div><b>الوجبات:</b> ${d.meals.length} فئة</div>
+          <div><b>المشاوي:</b> ${d.grills.length}</div>
+          <div><b>حجم البيانات:</b> ${Math.round(JSON.stringify(d).length/1024)} KB</div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function savePassword() {
+  const user = document.getElementById('set_user').value.trim();
+  const pass = document.getElementById('set_pass').value;
+  const pass2 = document.getElementById('set_pass2').value;
+  if (!user) { toast('أدخل اسم المستخدم','error'); return; }
+  if (pass && pass !== pass2) { toast('كلمتا المرور غير متطابقتين','error'); return; }
+  const d = getData();
+  d.credentials.username = user;
+  if (pass) d.credentials.password = pass;
+  persist();
+  document.getElementById('adminName').textContent = user;
+  document.getElementById('adminInitial').textContent = user[0].toUpperCase();
+  toast('تم تحديث بيانات الدخول ✓','success');
+}
+
+function exportData() {
+  const d = getData();
+  const blob = new Blob([JSON.stringify(d, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `restaurant-backup-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  toast('تم تصدير البيانات ✓','success');
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (!data.menuItems || !data.meals) { toast('ملف غير صالح','error'); return; }
+      confirm_('استيراد البيانات سيستبدل جميع البيانات الحالية. متأكد؟', () => {
+        window._siteData = data;
+        persist();
+        toast('تم استيراد البيانات بنجاح ✓','success');
+        renderSettings();
+        renderOverview();
+      });
+    } catch(err) { toast('خطأ في قراءة الملف','error'); }
+  };
+  reader.readAsText(file);
+}
+
+function resetData() {
+  confirm_('سيتم حذف جميع التغييرات والعودة للإعدادات الافتراضية. متأكد؟', () => {
+    window._siteData = JSON.parse(JSON.stringify(DEFAULTS));
+    persist();
+    toast('تمت إعادة الضبط للإعدادات الافتراضية ✓','success');
+    renderSettings(); renderOverview(); renderMenuTable();
+  });
+}
+
+/* ════════════════════════════════════════════════
+   UI HELPERS
+════════════════════════════════════════════════ */
+function openModal() { document.getElementById('modalOverlay').classList.add('open'); }
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); }
+function handleModalClick(e) { if(e.target===document.getElementById('modalOverlay')) closeModal(); }
+
+let _confirmCallback = null;
+function confirm_(msg, cb) {
+  document.getElementById('confirmMsg').textContent = msg||'هل أنت متأكد؟';
+  _confirmCallback = cb;
+  document.getElementById('confirmOverlay').classList.add('open');
+  document.getElementById('confirmOkBtn').onclick = () => { closeConfirm(); if(_confirmCallback) _confirmCallback(); };
+}
+function closeConfirm() { document.getElementById('confirmOverlay').classList.remove('open'); }
+
+function toast(msg, type='success') {
+  const icons = {success:'fa-circle-check', error:'fa-circle-xmark', warning:'fa-triangle-exclamation'};
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<i class="fas ${icons[type]||'fa-circle-check'}"></i> ${msg}`;
+  document.getElementById('toastContainer').appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+function previewImg(inputId, previewId) {
+  const url = document.getElementById(inputId)?.value;
+  const prev = document.getElementById(previewId);
+  if (!prev) return;
+  prev.style.display = url ? 'block' : 'none';
+  prev.src = url;
+}
+
+function toggleSection(bodyId) {
+  const el = document.getElementById(bodyId);
+  if(el) el.style.display = el.style.display==='none' ? 'block' : 'none';
+}
+
+/* ════════════════════════════════════════════════
+   INIT ON LOAD
+════════════════════════════════════════════════ */
+window.addEventListener('load', () => {
+  const loggedIn = sessionStorage.getItem('adminLoggedIn');
+  if (loggedIn) {
+    document.getElementById('loginPage').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'block';
+    document.getElementById('adminName').textContent = loggedIn;
+    document.getElementById('adminInitial').textContent = loggedIn[0].toUpperCase();
+    initDashboard();
+  }
+});
+</script>
+</body>
+</html>
