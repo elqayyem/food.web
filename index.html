@@ -16,8 +16,10 @@
     font-src   'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;
     img-src    'self' https: data:;
     connect-src 'self' https://hnyzgeucabtpppyxnsel.supabase.co;
-    frame-ancestors 'none';
   " />
+  <!-- NOTE: frame-ancestors cannot be set via meta tag — HTTP header only.
+       GitHub Pages does not support custom headers, so clickjacking protection
+       for the public site is handled by modern browsers' default behavior. -->
 
   <!-- SECURITY: Disable access to sensitive browser APIs not needed by this site -->
   <meta http-equiv="Permissions-Policy" content="geolocation=(), microphone=(), camera=()" />

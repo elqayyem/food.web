@@ -16,8 +16,8 @@
   font-src   'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;
   img-src    'self' https: data: blob:;
   connect-src 'self' https://hnyzgeucabtpppyxnsel.supabase.co;
-  frame-ancestors 'none';
 "/>
+<!-- NOTE: frame-ancestors must be an HTTP header — removed from meta tag to fix browser warning -->
 
 <!-- SECURITY: Block embedding this page in iframes (clickjacking protection) -->
 <meta http-equiv="X-Frame-Options" content="DENY"/>
