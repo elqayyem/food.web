@@ -1813,9 +1813,9 @@ function renderContent() {
           <div class="form-group"><label>نص زر المنيو</label><input class="form-control" id="c_btnMenu" value="${d.hero.btnMenu}"/></div>
           <div class="form-group"><label>نص زر الطلب</label><input class="form-control" id="c_btnOrder" value="${d.hero.btnOrder}"/></div>
         </div>
-        <div class="form-group"><label>صورة الهيرو 1</label><input class="form-control" id="c_img1" value="${d.hero.img1}" oninput="previewImg('c_img1','prev_img1')"/><img id="prev_img1" class="img-preview" src="${d.hero.img1}" onerror="this.style.display='none'"/></div>
-        <div class="form-group"><label>صورة الهيرو 2</label><input class="form-control" id="c_img2" value="${d.hero.img2}" oninput="previewImg('c_img2','prev_img2')"/><img id="prev_img2" class="img-preview" src="${d.hero.img2}" onerror="this.style.display='none'"/></div>
-        <div class="form-group"><label>صورة الهيرو 3</label><input class="form-control" id="c_img3" value="${d.hero.img3}" oninput="previewImg('c_img3','prev_img3')"/><img id="prev_img3" class="img-preview" src="${d.hero.img3}" onerror="this.style.display='none'"/></div>
+        <div class="form-group">
+          ${imgFieldHTML('c_img1','prev_img1','صورة الواجهة الرئيسية')}
+        </div>
       </div>
     </div>
 
@@ -1862,6 +1862,8 @@ function renderContent() {
       </div>
     </div>
   `;
+  attachImgUpload('c_img1','prev_img1');
+  if (d.hero.img1) { document.getElementById('c_img1').value = d.hero.img1; previewImg('c_img1','prev_img1'); }
 }
 
 function saveContent() {
