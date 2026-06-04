@@ -170,6 +170,28 @@
     attachReveal(row.querySelectorAll('.reveal'));
   }
 
+  /* ── Render fatoor section ── */
+  function renderFatoor(items) {
+    const grid = document.getElementById('fatoorGrid');
+    if (!grid || !items) return;
+    grid.innerHTML = items.map(item => `
+      <div class="fatoor-card reveal">
+        <img src="${sanitizeURL(item.image)}" alt="${escapeHTML(item.name)}" loading="lazy"
+             onerror="this.src='https://placehold.co/500x200?text=Image'"/>
+        <div class="fatoor-card-body">
+          <div class="fatoor-card-name">${escapeHTML(item.emoji||'')} ${escapeHTML(item.name)}</div>
+          <div class="fatoor-sizes">
+            ${(item.sizes||[]).map(s => `
+              <div class="fatoor-size-row">
+                <span class="fatoor-size-label">${escapeHTML(s.label)}</span>
+                <span class="fatoor-size-price">${Number(s.price).toLocaleString()} ل.ل</span>
+              </div>`).join('')}
+          </div>
+        </div>
+      </div>`).join('');
+    attachReveal(grid.querySelectorAll('.reveal'));
+  }
+
   /* ── Re-wire category filter & search after menu re-render ── */
   function rewireMenuControls() {
     const searchInput = document.getElementById('searchInput');
@@ -269,6 +291,7 @@
     if (d.meals)     renderMeals(d.meals);
     if (d.grills)    renderGrills(d.grills);
     if (d.features)  renderFeatures(d.features);
+    if (d.fatoor)    renderFatoor(d.fatoor);
   }
 
   /* Run after DOM is ready */

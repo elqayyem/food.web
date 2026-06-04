@@ -459,6 +459,7 @@ tr.dragging{opacity:.4}
         <button class="nav-item" onclick="showPage('menu',this)"><i class="fas fa-utensils"></i> المنيو</button>
         <button class="nav-item" onclick="showPage('meals',this)"><i class="fas fa-bowl-food"></i> الوجبات</button>
         <button class="nav-item" onclick="showPage('grills',this)"><i class="fas fa-fire"></i> المشاوي</button>
+        <button class="nav-item" onclick="showPage('fatoor',this)"><i class="fas fa-mug-hot"></i> الفطور</button>
         <button class="nav-item" onclick="showPage('content',this)"><i class="fas fa-pen-to-square"></i> النصوص</button>
 
         <div class="nav-section">الإعدادات</div>
@@ -550,6 +551,22 @@ tr.dragging{opacity:.4}
               <table>
                 <thead><tr><th>الصورة</th><th>الاسم</th><th>السعر</th><th>مميز</th><th>الترتيب</th><th>إجراءات</th></tr></thead>
                 <tbody id="grillsTbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── FATOOR ── -->
+        <div id="sec-fatoor" class="dash-section">
+          <div class="page-header">
+            <h2><i class="fas fa-mug-hot" style="color:var(--red)"></i> إدارة الفطور</h2>
+            <button class="btn btn-primary" onclick="openFatoorModal()"><i class="fas fa-plus"></i> إضافة صنف</button>
+          </div>
+          <div class="card">
+            <div class="tbl-wrap">
+              <table>
+                <thead><tr><th>الصورة</th><th>الاسم</th><th>صغير</th><th>وسط</th><th>كبير</th><th>الترتيب</th><th>إجراءات</th></tr></thead>
+                <tbody id="fatoorTbody"></tbody>
               </table>
             </div>
           </div>
@@ -715,7 +732,15 @@ const DEFAULTS = {
     {id:4,name:'شقف',price:2400,image:'https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=400&q=80',popular:false},
     {id:5,name:'طاووق',price:1300,image:'https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=400&q=80',popular:false}
   ],
-  orders:[]
+  orders:[],
+  fatoor:[
+    {id:1,name:'ماليزية',emoji:'🟡',image:'https://images.unsplash.com/photo-1547592180-85f173990554?w=500&q=80',sizes:[{label:'صغير',price:180},{label:'وسط',price:250},{label:'كبير',price:350}]},
+    {id:2,name:'فتة حمص',emoji:'🟤',image:'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=500&q=80',sizes:[{label:'صغير',price:180},{label:'وسط',price:250},{label:'كبير',price:350}]},
+    {id:3,name:'حمص مسبحة',emoji:'🟢',image:'https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?w=500&q=80',sizes:[{label:'صغير',price:150},{label:'وسط',price:200},{label:'كبير',price:300}]},
+    {id:4,name:'فول',emoji:'🟠',image:'https://images.unsplash.com/photo-1512058454905-6b841e7ad132?w=500&q=80',sizes:[{label:'صغير',price:150},{label:'وسط',price:200},{label:'كبير',price:350}]},
+    {id:5,name:'حمص ناعم',emoji:'🟣',image:'https://images.unsplash.com/photo-1593001872095-7d5b3868fb1f?w=500&q=80',sizes:[{label:'صغير',price:150},{label:'وسط',price:200},{label:'كبير',price:350}]},
+    {id:6,name:'حمص ناعم بلحمة',emoji:'🔴',image:'https://images.unsplash.com/photo-1529059997568-3d847b1154f0?w=500&q=80',sizes:[{label:'صغير',price:350},{label:'وسط',price:400},{label:'كبير',price:650}]}
+  ]
 };
 
 const CAT_NAMES = {sandwiches:'ساندويشات',shawarma:'شاورما',grills:'مشاوي',chicken:'فراريج',meals:'وجبات'};
@@ -953,8 +978,9 @@ document.getElementById('loginUser').addEventListener('keydown', e => { if(e.key
 ════════════════════════════════════════════════ */
 const PAGE_TITLES = {
   overview:'لوحة التحكم', menu:'إدارة المنيو', meals:'إدارة الوجبات',
-  grills:'إدارة المشاوي', content:'تعديل النصوص', design:'إعدادات التصميم',
-  contact:'معلومات التواصل', media:'مكتبة الصور', orders:'الطلبات', settings:'الإعدادات'
+  grills:'إدارة المشاوي', fatoor:'إدارة الفطور', content:'تعديل النصوص',
+  design:'إعدادات التصميم', contact:'معلومات التواصل',
+  media:'مكتبة الصور', orders:'الطلبات', settings:'الإعدادات'
 };
 
 function showPage(id, btn) {
@@ -967,9 +993,9 @@ function showPage(id, btn) {
   // Lazy render each section
   const renderers = {
     overview: renderOverview, menu: renderMenuTable, meals: renderMeals,
-    grills: renderGrills, content: renderContent, design: renderDesign,
-    contact: renderContact, media: renderMedia, orders: renderOrders,
-    settings: renderSettings
+    grills: renderGrills, fatoor: renderFatoor, content: renderContent,
+    design: renderDesign, contact: renderContact, media: renderMedia,
+    orders: renderOrders, settings: renderSettings
   };
   if (renderers[id]) renderers[id]();
 }
@@ -1395,6 +1421,106 @@ function moveGrill(id, dir) {
   if (swapIdx<0||swapIdx>=d.grills.length) return;
   [d.grills[idx],d.grills[swapIdx]] = [d.grills[swapIdx],d.grills[idx]];
   persist(); renderGrills();
+}
+
+/* ════════════════════════════════════════════════
+   FATOOR MANAGEMENT
+════════════════════════════════════════════════ */
+function renderFatoor() {
+  const d = getData();
+  const items = d.fatoor || [];
+  document.getElementById('fatoorTbody').innerHTML = items.length ? items.map(item => {
+    const s = item.sizes || [];
+    const get = label => s.find(x=>x.label===label)?.price || '—';
+    return `
+    <tr>
+      <td><img class="td-img" src="${sanitizeURL(item.image)||'https://placehold.co/50'}" alt="${escapeHTML(item.name)}" onerror="this.src='https://placehold.co/50'"/></td>
+      <td style="font-weight:800">${escapeHTML(item.emoji||'')} ${escapeHTML(item.name)}</td>
+      <td style="color:var(--gold);font-weight:700">${Number(get('صغير')).toLocaleString()} ل.ل</td>
+      <td style="color:var(--gold);font-weight:700">${Number(get('وسط')).toLocaleString()} ل.ل</td>
+      <td style="color:var(--gold);font-weight:700">${Number(get('كبير')).toLocaleString()} ل.ل</td>
+      <td>
+        <div style="display:flex;gap:4px">
+          <button class="btn btn-sm btn-secondary" onclick="moveFatoor(${item.id},-1)"><i class="fas fa-arrow-up"></i></button>
+          <button class="btn btn-sm btn-secondary" onclick="moveFatoor(${item.id},1)"><i class="fas fa-arrow-down"></i></button>
+        </div>
+      </td>
+      <td><div class="td-actions">
+        <button class="btn btn-sm btn-info" onclick="openFatoorModal(${item.id})"><i class="fas fa-pen"></i></button>
+        <button class="btn btn-sm btn-danger" onclick="deleteFatoor(${item.id})"><i class="fas fa-trash"></i></button>
+      </div></td>
+    </tr>`}).join('')
+  : '<tr><td colspan="7"><div class="empty-state"><i class="fas fa-mug-hot"></i><p>لا توجد أصناف فطور</p></div></td></tr>';
+}
+
+function openFatoorModal(id) {
+  const d = getData();
+  const item = id ? (d.fatoor||[]).find(x=>x.id===id) : null;
+  const s = item?.sizes || [{label:'صغير',price:''},{label:'وسط',price:''},{label:'كبير',price:''}];
+  const get = label => s.find(x=>x.label===label)?.price || '';
+  document.getElementById('modalTitle').textContent = item ? 'تعديل صنف الفطور' : 'إضافة صنف فطور';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="form-row">
+      <div class="form-group"><label>الاسم *</label><input class="form-control" id="ft_name" value="${escapeHTML(item?.name||'')}" placeholder="مثال: فول"/></div>
+      <div class="form-group"><label>الإيموجي</label><input class="form-control" id="ft_emoji" value="${escapeHTML(item?.emoji||'')}" placeholder="🟡" style="font-size:18px"/></div>
+    </div>
+    <div class="form-group">
+      <label>رابط الصورة *</label>
+      <input class="form-control" id="ft_img" value="${escapeHTML(item?.image||'')}" placeholder="https://..." oninput="previewImg('ft_img','ft_preview')"/>
+      <img id="ft_preview" class="img-preview" src="${item?.image||''}" onerror="this.style.display='none'" style="${item?'':'display:none'}"/>
+    </div>
+    <div style="background:#f8fafc;border-radius:10px;padding:14px;border:1px solid var(--border)">
+      <label style="font-size:13px;font-weight:800;display:block;margin-bottom:12px">الأسعار حسب الحجم</label>
+      <div class="form-row">
+        <div class="form-group"><label>صغير (ل.ل)</label><input class="form-control" id="ft_p1" type="number" value="${get('صغير')}" placeholder="150"/></div>
+        <div class="form-group"><label>وسط (ل.ل)</label><input class="form-control" id="ft_p2" type="number" value="${get('وسط')}" placeholder="200"/></div>
+      </div>
+      <div class="form-group"><label>كبير (ل.ل)</label><input class="form-control" id="ft_p3" type="number" value="${get('كبير')}" placeholder="300"/></div>
+    </div>`;
+  document.getElementById('modalFooter').innerHTML = `
+    <button class="btn btn-primary" onclick="saveFatoor(${id||0})"><i class="fas fa-save"></i> حفظ</button>
+    <button class="btn btn-secondary" onclick="closeModal()">إلغاء</button>`;
+  openModal();
+}
+
+function saveFatoor(id) {
+  const name  = sanitizeInput(document.getElementById('ft_name').value, 100);
+  const emoji = sanitizeInput(document.getElementById('ft_emoji').value, 10);
+  const img   = sanitizeURL(document.getElementById('ft_img').value.trim());
+  const p1    = parseInt(document.getElementById('ft_p1').value) || 0;
+  const p2    = parseInt(document.getElementById('ft_p2').value) || 0;
+  const p3    = parseInt(document.getElementById('ft_p3').value) || 0;
+  if (!name || !img) { toast('أكمل الاسم والصورة','error'); return; }
+  const sizes = [{label:'صغير',price:p1},{label:'وسط',price:p2},{label:'كبير',price:p3}];
+  const d = getData();
+  if (!d.fatoor) d.fatoor = [];
+  if (id) {
+    const i = d.fatoor.findIndex(x=>x.id===id);
+    if (i>=0) Object.assign(d.fatoor[i], {name,emoji,image:img,sizes});
+  } else {
+    const maxId = d.fatoor.reduce((m,x)=>Math.max(m,x.id),0);
+    d.fatoor.push({id:maxId+1,name,emoji,image:img,sizes});
+  }
+  persist(); closeModal(); renderFatoor();
+  toast(id?'تم التعديل':'تمت الإضافة','success');
+}
+
+function deleteFatoor(id) {
+  confirm_('حذف هذا الصنف من الفطور؟', () => {
+    const d = getData();
+    d.fatoor = (d.fatoor||[]).filter(x=>x.id!==id);
+    persist(); renderFatoor(); toast('تم الحذف','success');
+  });
+}
+
+function moveFatoor(id, dir) {
+  const d = getData();
+  if (!d.fatoor) return;
+  const idx = d.fatoor.findIndex(x=>x.id===id);
+  const swapIdx = idx + dir;
+  if (swapIdx<0||swapIdx>=d.fatoor.length) return;
+  [d.fatoor[idx],d.fatoor[swapIdx]] = [d.fatoor[swapIdx],d.fatoor[idx]];
+  persist(); renderFatoor();
 }
 
 /* ════════════════════════════════════════════════
