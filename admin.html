@@ -759,11 +759,15 @@ function escapeHTML(str) {
     .replace(/'/g, '&#x27;');
 }
 
-/* Allow only http/https URLs for images — blocks javascript: and data: URIs */
+/* Allow image URLs — blocks only truly dangerous protocols (javascript:, data:, vbscript:) */
 function sanitizeURL(url) {
-  const s = String(url || '').trim();
-  if (/^https?:\/\//i.test(s)) return s;
-  return '';
+  let s = String(url || '').trim();
+  if (!s) return '';
+  // Block dangerous protocols only
+  if (/^(javascript|data|vbscript):/i.test(s)) return '';
+  // Auto-add https:// if user forgot it
+  if (!/^https?:\/\//i.test(s)) s = 'https://' + s;
+  return s;
 }
 
 /* Sanitize and trim a text input — strips tags, limits length */
@@ -1155,8 +1159,8 @@ function openMenuModal(id) {
     </div>
     <div class="form-group">
       <label>رابط الصورة *</label>
-      <input class="form-control" id="mi_img" value="${item?item.image:''}" placeholder="https://..." oninput="previewImg('mi_img','mi_preview')"/>
-      <img id="mi_preview" class="img-preview" src="${item?item.image:''}" onerror="this.style.display='none'" style="${item?'':'display:none'}"/>
+      <input class="form-control" id="mi_img" placeholder="https://..." oninput="previewImg('mi_img','mi_preview')"/>
+      <img id="mi_preview" class="img-preview" src="" onerror="this.style.display='none'" style="display:none"/>
     </div>
     <div class="form-group">
       <label style="display:flex;align-items:center;gap:10px">
@@ -1170,6 +1174,11 @@ function openMenuModal(id) {
     <button class="btn btn-secondary" onclick="closeModal()">إلغاء</button>
   `;
   openModal();
+  /* Set image value via JS to avoid HTML encoding issues with & in URLs */
+  if (item) {
+    document.getElementById('mi_img').value = item.image || '';
+    previewImg('mi_img','mi_preview');
+  }
 }
 
 function saveMenuItem(id) {
@@ -1265,12 +1274,16 @@ function openMealModal(id) {
     <div class="form-group"><label>اسم الفئة *</label><input class="form-control" id="mel_name" value="${meal?meal.name:''}" placeholder="مثال: البروستد"/></div>
     <div class="form-group">
       <label>رابط الصورة</label>
-      <input class="form-control" id="mel_img" value="${meal?meal.image:''}" placeholder="https://..." oninput="previewImg('mel_img','mel_preview')"/>
-      <img id="mel_preview" class="img-preview" src="${meal?meal.image:''}" onerror="this.style.display='none'" style="${meal?'':'display:none'}"/>
+      <input class="form-control" id="mel_img" placeholder="https://..." oninput="previewImg('mel_img','mel_preview')"/>
+      <img id="mel_preview" class="img-preview" src="" onerror="this.style.display='none'" style="display:none"/>
     </div>`;
   document.getElementById('modalFooter').innerHTML = `
     <button class="btn btn-primary" onclick="saveMeal(${id||0})"><i class="fas fa-save"></i> حفظ</button>
     <button class="btn btn-secondary" onclick="closeModal()">إلغاء</button>`;
+  if (meal) {
+    document.getElementById('mel_img').value = meal.image || '';
+    previewImg('mel_img','mel_preview');
+  }
   openModal();
 }
 
@@ -1371,14 +1384,18 @@ function openGrillModal(id) {
     </div>
     <div class="form-group">
       <label>رابط الصورة *</label>
-      <input class="form-control" id="gr_img" value="${g?g.image:''}" placeholder="https://..." oninput="previewImg('gr_img','gr_preview')"/>
-      <img id="gr_preview" class="img-preview" src="${g?g.image:''}" onerror="this.style.display='none'" style="${g?'':'display:none'}"/>
+      <input class="form-control" id="gr_img" placeholder="https://..." oninput="previewImg('gr_img','gr_preview')"/>
+      <img id="gr_preview" class="img-preview" src="" onerror="this.style.display='none'" style="display:none"/>
     </div>
     <div class="form-group"><label style="display:flex;align-items:center;gap:10px"><label class="toggle"><input type="checkbox" id="gr_pop" ${g&&g.popular?'checked':''}><span class="toggle-slider"></span></label> مميز</label></div>`;
   document.getElementById('modalFooter').innerHTML = `
     <button class="btn btn-primary" onclick="saveGrill(${id||0})"><i class="fas fa-save"></i> حفظ</button>
     <button class="btn btn-secondary" onclick="closeModal()">إلغاء</button>`;
   openModal();
+  if (g) {
+    document.getElementById('gr_img').value = g.image || '';
+    previewImg('gr_img','gr_preview');
+  }
 }
 
 function saveGrill(id) {
@@ -1466,8 +1483,8 @@ function openFatoorModal(id) {
     </div>
     <div class="form-group">
       <label>رابط الصورة *</label>
-      <input class="form-control" id="ft_img" value="${escapeHTML(item?.image||'')}" placeholder="https://..." oninput="previewImg('ft_img','ft_preview')"/>
-      <img id="ft_preview" class="img-preview" src="${item?.image||''}" onerror="this.style.display='none'" style="${item?'':'display:none'}"/>
+      <input class="form-control" id="ft_img" placeholder="https://..." oninput="previewImg('ft_img','ft_preview')"/>
+      <img id="ft_preview" class="img-preview" src="" onerror="this.style.display='none'" style="display:none"/>
     </div>
     <div style="background:#f8fafc;border-radius:10px;padding:14px;border:1px solid var(--border)">
       <label style="font-size:13px;font-weight:800;display:block;margin-bottom:12px">الأسعار حسب الحجم</label>
@@ -1481,6 +1498,10 @@ function openFatoorModal(id) {
     <button class="btn btn-primary" onclick="saveFatoor(${id||0})"><i class="fas fa-save"></i> حفظ</button>
     <button class="btn btn-secondary" onclick="closeModal()">إلغاء</button>`;
   openModal();
+  if (item) {
+    document.getElementById('ft_img').value = item.image || '';
+    previewImg('ft_img','ft_preview');
+  }
 }
 
 function saveFatoor(id) {
