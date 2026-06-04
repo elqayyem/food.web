@@ -567,7 +567,7 @@
     .drinks-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
     .drink-card { background: var(--dark3); border-radius: 16px; overflow: hidden; border: 1px solid var(--dark4); transition: transform .3s, border-color .3s, box-shadow .3s; }
     .drink-card:hover { transform: translateY(-6px); border-color: var(--gold); box-shadow: 0 14px 36px rgba(232,160,32,.2); }
-    .drink-card img { width: 100%; height: 200px; object-fit: cover; display: block; }
+    .drink-card img { width: 100%; height: 200px; object-fit: contain; object-position: center; background: var(--dark4); display: block; }
     .drink-card-body { padding: 16px 18px; }
     .drink-card-name { font-size: 17px; font-weight: 900; color: #fff; margin-bottom: 14px; text-align: center; }
     .drink-sizes { display: flex; flex-direction: column; gap: 8px; }
