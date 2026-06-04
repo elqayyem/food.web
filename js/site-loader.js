@@ -192,6 +192,46 @@
     attachReveal(grid.querySelectorAll('.reveal'));
   }
 
+  /* ── Render drinks section ── */
+  function renderDrinks(cats) {
+    const grid = document.getElementById('drinksGrid');
+    if (!grid || !cats || !cats.length) return;
+    grid.innerHTML = cats.map(cat => {
+      const sizeHeaders = (cat.sizes||[]).map(s => `<th>${escapeHTML(s)}</th>`).join('');
+      const rows = (cat.items||[]).map(item => {
+        const priceCells = (item.prices||[]).map(p => `<td class="drink-price">${Number(p).toLocaleString()}</td>`).join('');
+        return `<tr><td>${escapeHTML(item.name)}</td>${priceCells}</tr>`;
+      }).join('');
+      let extrasHTML = '';
+      if (cat.extras && cat.extras.length) {
+        extrasHTML = `<div class="drinks-extras">${cat.extras.map(e =>
+          `<span class="drinks-extra-item">${escapeHTML(e.name)}: <span class="drinks-extra-price">${Number(e.price).toLocaleString()} ل.ل</span></span>`
+        ).join('<span style="color:var(--muted)"> | </span>')}</div>`;
+      }
+      let kiloHTML = '';
+      if (cat.kiloItems && cat.kiloItems.length) {
+        const kiloHeaders = (cat.kiloSizes||[]).map(s => `<th>${escapeHTML(s)}</th>`).join('');
+        const kiloRows = cat.kiloItems.map(item => {
+          const priceCells = (item.prices||[]).map(p => `<td class="drink-price">${Number(p).toLocaleString()}</td>`).join('');
+          return `<tr><td>${escapeHTML(item.name)}</td>${priceCells}</tr>`;
+        }).join('');
+        kiloHTML = `<div class="drinks-kilo-head">نصف كيلو / كيلو</div>
+          <table class="drinks-table"><thead><tr><th>الصنف</th>${kiloHeaders}</tr></thead><tbody>${kiloRows}</tbody></table>`;
+      }
+      return `<div class="drinks-cat reveal">
+        <div class="drinks-cat-head">
+          <span style="font-size:26px">${escapeHTML(cat.icon||'🥤')}</span>
+          <div><h3>${escapeHTML(cat.name)}</h3><div class="drinks-cat-en">${escapeHTML(cat.nameEn||'')}</div></div>
+        </div>
+        <table class="drinks-table">
+          <thead><tr><th>الصنف</th>${sizeHeaders}</tr></thead>
+          <tbody>${rows}</tbody>
+        </table>${extrasHTML}${kiloHTML}
+      </div>`;
+    }).join('');
+    attachReveal(grid.querySelectorAll('.reveal'));
+  }
+
   /* ── Re-wire category filter & search after menu re-render ── */
   function rewireMenuControls() {
     const searchInput = document.getElementById('searchInput');
@@ -292,6 +332,7 @@
     if (d.grills)    renderGrills(d.grills);
     if (d.features)  renderFeatures(d.features);
     if (d.fatoor)    renderFatoor(d.fatoor);
+    if (d.drinks)    renderDrinks(d.drinks);
   }
 
   /* Run after DOM is ready */

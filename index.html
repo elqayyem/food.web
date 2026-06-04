@@ -559,6 +559,25 @@
 
     @media (max-width: 900px) { .fatoor-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 560px) { .fatoor-grid { grid-template-columns: 1fr; } }
+
+    /* ── DRINKS SECTION ── */
+    .drinks-section { padding: 90px 0; background: var(--dark); }
+    .drinks-cats { display: flex; flex-direction: column; gap: 32px; }
+    .drinks-cat { background: var(--dark3); border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,.06); }
+    .drinks-cat-head { background: var(--dark4); padding: 18px 24px; display: flex; align-items: center; gap: 14px; border-bottom: 2px solid var(--red); }
+    .drinks-cat-head h3 { font-size: 20px; font-weight: 800; color: var(--gold); margin: 0; }
+    .drinks-cat-en { font-size: 11px; color: var(--muted); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+    .drinks-table { width: 100%; border-collapse: collapse; }
+    .drinks-table th { background: rgba(200,16,46,.12); color: var(--gold); font-size: 13px; font-weight: 700; padding: 10px 16px; text-align: right; border-bottom: 1px solid rgba(255,255,255,.08); }
+    .drinks-table td { padding: 10px 16px; font-size: 14px; border-bottom: 1px solid rgba(255,255,255,.04); color: var(--text); }
+    .drinks-table tr:last-child td { border-bottom: none; }
+    .drinks-table tr:hover td { background: rgba(255,255,255,.03); }
+    .drink-price { color: var(--gold); font-weight: 800; }
+    .drinks-extras { padding: 12px 20px; background: rgba(232,160,32,.07); border-top: 1px solid rgba(232,160,32,.18); display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+    .drinks-extra-item { font-size: 13px; color: var(--text); }
+    .drinks-extra-price { color: var(--gold); font-weight: 700; }
+    .drinks-kilo-head { padding: 10px 16px; background: rgba(232,160,32,.1); font-size: 13px; font-weight: 700; color: var(--gold); border-top: 2px solid rgba(232,160,32,.25); }
+    @media (max-width: 600px) { .drinks-table th, .drinks-table td { padding: 8px 10px; font-size: 12px; } }
   </style>
 </head>
 <body>
@@ -580,6 +599,7 @@
         <li><a href="#grills">مشاوي</a></li>
         <li><a href="#meals">وجبات</a></li>
         <li><a href="#fatoor">فطور</a></li>
+        <li><a href="#drinks">أشربة</a></li>
         <li><a href="#about">عن المطعم</a></li>
         <li><a href="#contact">تواصل معنا</a></li>
       </ul>
@@ -1171,6 +1191,17 @@
         </div>
 
       </div>
+    </div>
+  </section>
+
+  <!-- ══════════ DRINKS SECTION ══════════ -->
+  <section class="drinks-section" id="drinks">
+    <div class="container">
+      <div class="sec-head reveal">
+        <h2>🥤 أشربتنا</h2>
+        <p>عصائر طازجة — كوكتيلات — ميلك شيك — آيس كريم</p>
+      </div>
+      <div class="drinks-cats" id="drinksGrid"></div>
     </div>
   </section>
 
