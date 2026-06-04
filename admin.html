@@ -1578,9 +1578,17 @@ function renderDrinksAdmin() {
   const cats = d.drinks || [];
   document.getElementById('drinksEditor').innerHTML = cats.map(cat => `
     <div class="card" style="margin-bottom:24px">
-      <div class="card-head" style="display:flex;justify-content:space-between;align-items:center">
-        <h3>${escapeHTML(cat.icon||'')} ${escapeHTML(cat.name)} <span style="color:var(--muted);font-size:12px;font-weight:400">${escapeHTML(cat.nameEn||'')}</span></h3>
-        <button class="btn btn-primary btn-sm" onclick="openDrinkItemModal(${cat.id},null)"><i class="fas fa-plus"></i> إضافة صنف</button>
+      <div class="card-head" style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+        <div style="display:flex;align-items:center;gap:12px">
+          <img src="${sanitizeURL(cat.image||'')}" style="width:48px;height:48px;object-fit:cover;border-radius:10px;border:2px solid var(--border);${cat.image?'':'display:none'}" id="dcat_prev_${cat.id}" onerror="this.style.display='none'"/>
+          <div>
+            <h3 style="margin:0">${escapeHTML(cat.icon||'')} ${escapeHTML(cat.name)} <span style="color:var(--muted);font-size:12px;font-weight:400">${escapeHTML(cat.nameEn||'')}</span></h3>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-sm btn-secondary" onclick="openDrinkCatModal(${cat.id})"><i class="fas fa-image"></i> صورة الفئة</button>
+          <button class="btn btn-primary btn-sm" onclick="openDrinkItemModal(${cat.id},null)"><i class="fas fa-plus"></i> إضافة صنف</button>
+        </div>
       </div>
       <div class="tbl-wrap">
         <table>
@@ -1746,6 +1754,32 @@ function deleteDrinkKilo(catId, idx) {
     cat.kiloItems.splice(idx,1);
     persist(); renderDrinksAdmin(); toast('تم الحذف','success');
   });
+}
+
+function openDrinkCatModal(catId) {
+  const d = getData();
+  const cat = (d.drinks||[]).find(c=>c.id===catId);
+  if (!cat) return;
+  document.getElementById('modalTitle').textContent = `صورة فئة: ${cat.name}`;
+  document.getElementById('modalBody').innerHTML = `
+    <div class="form-group">${imgFieldHTML('dc_img','dc_preview','صورة الفئة')}</div>`;
+  document.getElementById('modalFooter').innerHTML = `
+    <button class="btn btn-primary" onclick="saveDrinkCat(${catId})"><i class="fas fa-save"></i> حفظ</button>
+    <button class="btn btn-secondary" onclick="closeModal()">إلغاء</button>`;
+  openModal();
+  attachImgUpload('dc_img','dc_preview');
+  if (cat.image) { document.getElementById('dc_img').value = cat.image; previewImg('dc_img','dc_preview'); }
+}
+
+function saveDrinkCat(catId) {
+  const d = getData();
+  const cat = (d.drinks||[]).find(c=>c.id===catId);
+  if (!cat) return;
+  const img = sanitizeURL(document.getElementById('dc_img').value.trim());
+  if (!img) { toast('أدخل رابط الصورة أو ارفع صورة','error'); return; }
+  cat.image = img;
+  persist(); closeModal(); renderDrinksAdmin();
+  toast('تم حفظ صورة الفئة','success');
 }
 
 /* ════════════════════════════════════════════════

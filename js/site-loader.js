@@ -218,7 +218,9 @@
         kiloHTML = `<div class="drinks-kilo-head">نصف كيلو / كيلو</div>
           <table class="drinks-table"><thead><tr><th>الصنف</th>${kiloHeaders}</tr></thead><tbody>${kiloRows}</tbody></table>`;
       }
+      const imgHTML = cat.image ? `<img src="${sanitizeURL(cat.image)}" alt="${escapeHTML(cat.name)}" class="drinks-cat-img" onerror="this.style.display='none'"/>` : '';
       return `<div class="drinks-cat reveal">
+        ${imgHTML}
         <div class="drinks-cat-head">
           <span style="font-size:26px">${escapeHTML(cat.icon||'🥤')}</span>
           <div><h3>${escapeHTML(cat.name)}</h3><div class="drinks-cat-en">${escapeHTML(cat.nameEn||'')}</div></div>
