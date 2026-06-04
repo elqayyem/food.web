@@ -1170,11 +1170,8 @@ function openMenuModal(id) {
     <button class="btn btn-secondary" onclick="closeModal()">إلغاء</button>
   `;
   openModal();
-  /* Set image value via JS to avoid HTML encoding issues with & in URLs */
-  if (item) {
-    document.getElementById('mi_img').value = item.image || '';
-    previewImg('mi_img','mi_preview');
-  }
+  attachImgUpload('mi_img','mi_preview');
+  if (item) { document.getElementById('mi_img').value = item.image || ''; previewImg('mi_img','mi_preview'); }
 }
 
 function saveMenuItem(id) {
@@ -1272,11 +1269,9 @@ function openMealModal(id) {
   document.getElementById('modalFooter').innerHTML = `
     <button class="btn btn-primary" onclick="saveMeal(${id||0})"><i class="fas fa-save"></i> حفظ</button>
     <button class="btn btn-secondary" onclick="closeModal()">إلغاء</button>`;
-  if (meal) {
-    document.getElementById('mel_img').value = meal.image || '';
-    previewImg('mel_img','mel_preview');
-  }
   openModal();
+  attachImgUpload('mel_img','mel_preview');
+  if (meal) { document.getElementById('mel_img').value = meal.image || ''; previewImg('mel_img','mel_preview'); }
 }
 
 function saveMeal(id) {
@@ -1380,10 +1375,8 @@ function openGrillModal(id) {
     <button class="btn btn-primary" onclick="saveGrill(${id||0})"><i class="fas fa-save"></i> حفظ</button>
     <button class="btn btn-secondary" onclick="closeModal()">إلغاء</button>`;
   openModal();
-  if (g) {
-    document.getElementById('gr_img').value = g.image || '';
-    previewImg('gr_img','gr_preview');
-  }
+  attachImgUpload('gr_img','gr_preview');
+  if (g) { document.getElementById('gr_img').value = g.image || ''; previewImg('gr_img','gr_preview'); }
 }
 
 function saveGrill(id) {
@@ -1484,10 +1477,8 @@ function openFatoorModal(id) {
     <button class="btn btn-primary" onclick="saveFatoor(${id||0})"><i class="fas fa-save"></i> حفظ</button>
     <button class="btn btn-secondary" onclick="closeModal()">إلغاء</button>`;
   openModal();
-  if (item) {
-    document.getElementById('ft_img').value = item.image || '';
-    previewImg('ft_img','ft_preview');
-  }
+  attachImgUpload('ft_img','ft_preview');
+  if (item) { document.getElementById('ft_img').value = item.image || ''; previewImg('ft_img','ft_preview'); }
 }
 
 function saveFatoor(id) {
@@ -1808,11 +1799,10 @@ function renderMedia() {
           ارفع صورة مباشرة من هاتفك أو جهازك — ستُحفظ في Supabase وتحصل على رابط جاهز للاستخدام.
         </p>
         <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
-          <label class="btn btn-primary" style="cursor:pointer">
+          <button class="btn btn-primary" id="libraryUploadBtn" type="button">
             <i class="fas fa-upload"></i> اختر صورة من الجهاز
-            <input type="file" accept="image/*" style="display:none"
-                   onchange="uploadImageToLibrary(this.files[0])"/>
-          </label>
+          </button>
+          <input type="file" id="libraryFileInput" accept="image/*" style="display:none"/>
           <span id="uploadedUrl" style="font-size:12px;color:var(--muted);word-break:break-all"></span>
         </div>
         <img id="uploadedPreview" src="" style="display:none;width:120px;height:100px;object-fit:cover;border-radius:10px;margin-top:12px;border:2px solid var(--border)"/>
@@ -1849,6 +1839,18 @@ function renderMedia() {
       </div>
     </div>
   `;
+
+  /* Attach upload events AFTER innerHTML is set — avoids inline handler issues */
+  const uploadBtn   = document.getElementById('libraryUploadBtn');
+  const fileInput   = document.getElementById('libraryFileInput');
+
+  uploadBtn.addEventListener('click', () => fileInput.click());
+
+  fileInput.addEventListener('change', () => {
+    const file = fileInput.files[0];
+    if (file) uploadImageToLibrary(file);
+    fileInput.value = ''; /* reset so same file can be re-selected */
+  });
 }
 
 /* ════════════════════════════════════════════════
@@ -2188,21 +2190,35 @@ async function uploadImage(file, inputId, previewId) {
 
 /* Helper — returns image field HTML with upload button */
 function imgFieldHTML(inputId, previewId, label = 'الصورة *') {
+  /* Returns HTML — caller must call attachImgUpload() after setting innerHTML */
   return `
     <div class="form-group">
       <label>${label}</label>
       <div style="display:flex;gap:8px;align-items:stretch">
         <input class="form-control" id="${inputId}" placeholder="https://... أو ارفع صورة من الزر"
                oninput="previewImg('${inputId}','${previewId}')"/>
-        <label class="btn btn-info" style="cursor:pointer;white-space:nowrap;flex-shrink:0;margin:0" title="رفع صورة من الجهاز">
+        <button type="button" class="btn btn-info"
+                id="upBtn_${inputId}"
+                style="white-space:nowrap;flex-shrink:0" title="رفع صورة من الجهاز">
           <i class="fas fa-upload"></i> رفع
-          <input type="file" accept="image/*" style="display:none"
-                 onchange="uploadImage(this.files[0],'${inputId}','${previewId}')"/>
-        </label>
+        </button>
+        <input type="file" id="upFile_${inputId}" accept="image/*" style="display:none"/>
       </div>
       <img id="${previewId}" class="img-preview" src=""
            onerror="this.style.display='none'" style="display:none;margin-top:8px"/>
     </div>`;
+}
+
+/* Attach upload events for a modal image field — call after openModal() */
+function attachImgUpload(inputId, previewId) {
+  const btn  = document.getElementById(`upBtn_${inputId}`);
+  const file = document.getElementById(`upFile_${inputId}`);
+  if (!btn || !file) return;
+  btn.onclick  = () => file.click();
+  file.onchange = () => {
+    if (file.files[0]) uploadImage(file.files[0], inputId, previewId);
+    file.value = '';
+  };
 }
 
 function toggleSection(bodyId) {
