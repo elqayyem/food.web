@@ -197,38 +197,51 @@
     const grid = document.getElementById('drinksGrid');
     if (!grid || !cats || !cats.length) return;
     grid.innerHTML = cats.map(cat => {
-      const sizeHeaders = (cat.sizes||[]).map(s => `<th>${escapeHTML(s)}</th>`).join('');
-      const rows = (cat.items||[]).map(item => {
-        const priceCells = (item.prices||[]).map(p => `<td class="drink-price">${Number(p).toLocaleString()}</td>`).join('');
-        return `<tr><td>${escapeHTML(item.name)}</td>${priceCells}</tr>`;
+      const itemCards = (cat.items||[]).map(item => {
+        const sizeRows = (cat.sizes||[]).map((s,i) => `
+          <div class="drink-size-row">
+            <span class="drink-size-label">${escapeHTML(s)}</span>
+            <span class="drink-size-price">${Number((item.prices||[])[i]||0).toLocaleString()} ل.ل</span>
+          </div>`).join('');
+        const img = item.image ? `<img src="${sanitizeURL(item.image)}" alt="${escapeHTML(item.name)}" loading="lazy" onerror="this.src='https://placehold.co/300x200?text=Image'"/>` : `<img src="https://placehold.co/300x200?text=Image" alt="${escapeHTML(item.name)}"/>`;
+        return `<div class="drink-card reveal">
+          ${img}
+          <div class="drink-card-body">
+            <div class="drink-card-name">${escapeHTML(item.name)}</div>
+            <div class="drink-sizes">${sizeRows}</div>
+          </div>
+        </div>`;
       }).join('');
+
       let extrasHTML = '';
       if (cat.extras && cat.extras.length) {
         extrasHTML = `<div class="drinks-extras">${cat.extras.map(e =>
           `<span class="drinks-extra-item">${escapeHTML(e.name)}: <span class="drinks-extra-price">${Number(e.price).toLocaleString()} ل.ل</span></span>`
         ).join('<span style="color:var(--muted)"> | </span>')}</div>`;
       }
+
       let kiloHTML = '';
       if (cat.kiloItems && cat.kiloItems.length) {
-        const kiloHeaders = (cat.kiloSizes||[]).map(s => `<th>${escapeHTML(s)}</th>`).join('');
-        const kiloRows = cat.kiloItems.map(item => {
-          const priceCells = (item.prices||[]).map(p => `<td class="drink-price">${Number(p).toLocaleString()}</td>`).join('');
-          return `<tr><td>${escapeHTML(item.name)}</td>${priceCells}</tr>`;
+        const kiloSizes = cat.kiloSizes||[];
+        const kiloCards = cat.kiloItems.map(item => {
+          const sizeRows = kiloSizes.map((s,i) => `
+            <div class="drink-size-row">
+              <span class="drink-size-label">${escapeHTML(s)}</span>
+              <span class="drink-size-price">${Number((item.prices||[])[i]||0).toLocaleString()} ل.ل</span>
+            </div>`).join('');
+          const img = item.image ? `<img src="${sanitizeURL(item.image)}" alt="${escapeHTML(item.name)}" loading="lazy" onerror="this.src='https://placehold.co/300x200?text=Image'"/>` : `<img src="https://placehold.co/300x200?text=Image" alt="${escapeHTML(item.name)}"/>`;
+          return `<div class="drink-card reveal">${img}<div class="drink-card-body"><div class="drink-card-name">${escapeHTML(item.name)}</div><div class="drink-sizes">${sizeRows}</div></div></div>`;
         }).join('');
-        kiloHTML = `<div class="drinks-kilo-head">نصف كيلو / كيلو</div>
-          <table class="drinks-table"><thead><tr><th>الصنف</th>${kiloHeaders}</tr></thead><tbody>${kiloRows}</tbody></table>`;
+        kiloHTML = `<div class="drinks-kilo"><div class="drinks-kilo-title">نصف كيلو / كيلو</div><div class="drinks-grid">${kiloCards}</div></div>`;
       }
-      const imgHTML = cat.image ? `<img src="${sanitizeURL(cat.image)}" alt="${escapeHTML(cat.name)}" class="drinks-cat-img" onerror="this.style.display='none'"/>` : '';
-      return `<div class="drinks-cat reveal">
-        ${imgHTML}
-        <div class="drinks-cat-head">
-          <span style="font-size:26px">${escapeHTML(cat.icon||'🥤')}</span>
+
+      return `<div class="drinks-cat">
+        <div class="drinks-cat-head reveal">
+          <span style="font-size:28px">${escapeHTML(cat.icon||'🥤')}</span>
           <div><h3>${escapeHTML(cat.name)}</h3><div class="drinks-cat-en">${escapeHTML(cat.nameEn||'')}</div></div>
         </div>
-        <table class="drinks-table">
-          <thead><tr><th>الصنف</th>${sizeHeaders}</tr></thead>
-          <tbody>${rows}</tbody>
-        </table>${extrasHTML}${kiloHTML}
+        <div class="drinks-grid">${itemCards}</div>
+        ${extrasHTML}${kiloHTML}
       </div>`;
     }).join('');
     attachReveal(grid.querySelectorAll('.reveal'));

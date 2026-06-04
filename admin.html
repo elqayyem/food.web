@@ -1592,10 +1592,11 @@ function renderDrinksAdmin() {
       </div>
       <div class="tbl-wrap">
         <table>
-          <thead><tr><th>الصنف</th>${(cat.sizes||[]).map(s=>`<th>${escapeHTML(s)}</th>`).join('')}<th>إجراءات</th></tr></thead>
+          <thead><tr><th>الصورة</th><th>الصنف</th>${(cat.sizes||[]).map(s=>`<th>${escapeHTML(s)}</th>`).join('')}<th>إجراءات</th></tr></thead>
           <tbody>
             ${(cat.items||[]).length ? (cat.items||[]).map((item,idx)=>`
               <tr>
+                <td><img class="td-img" src="${sanitizeURL(item.image||'')}" onerror="this.src='https://placehold.co/50'" style="${item.image?'':'opacity:.3'}"/></td>
                 <td style="font-weight:700">${escapeHTML(item.name)}</td>
                 ${(item.prices||[]).map(p=>`<td style="color:var(--gold);font-weight:800">${Number(p).toLocaleString()}</td>`).join('')}
                 <td><div style="display:flex;gap:4px">
@@ -1641,11 +1642,14 @@ function openDrinkItemModal(catId, idx) {
     <div class="form-group"><label>الاسم *</label><input class="form-control" id="di_name" value="${item?escapeHTML(item.name):''}"/></div>
     ${(cat.sizes||[]).map((s,i)=>`
       <div class="form-group"><label>${escapeHTML(s)} (ل.ل) *</label>
-        <input class="form-control" id="di_p${i}" type="number" value="${item?item.prices[i]:''}"/></div>`).join('')}`;
+        <input class="form-control" id="di_p${i}" type="number" value="${item&&item.prices?item.prices[i]:''}"/></div>`).join('')}
+    <div class="form-group">${imgFieldHTML('di_img','di_preview','الصورة')}</div>`;
   document.getElementById('modalFooter').innerHTML = `
     <button class="btn btn-primary" onclick="saveDrinkItem(${catId},${idx!==null&&idx!==undefined?idx:-1})"><i class="fas fa-save"></i> حفظ</button>
     <button class="btn btn-secondary" onclick="closeModal()">إلغاء</button>`;
   openModal();
+  attachImgUpload('di_img','di_preview');
+  if (item && item.image) { document.getElementById('di_img').value = item.image; previewImg('di_img','di_preview'); }
 }
 
 function saveDrinkItem(catId, idx) {
@@ -1656,11 +1660,12 @@ function saveDrinkItem(catId, idx) {
   if (!name) { toast('أدخل اسم الصنف','error'); return; }
   const prices = (cat.sizes||[]).map((_,i)=>parseInt(document.getElementById(`di_p${i}`).value)||0);
   if (prices.some(p=>p<=0)) { toast('أدخل الأسعار','error'); return; }
+  const img = sanitizeURL(document.getElementById('di_img').value.trim());
   if (idx >= 0) {
-    cat.items[idx] = {id:cat.items[idx].id, name, prices};
+    cat.items[idx] = {id:cat.items[idx].id, name, prices, image:img};
   } else {
     const maxId = (cat.items||[]).reduce((m,x)=>Math.max(m,x.id),0);
-    cat.items.push({id:maxId+1, name, prices});
+    cat.items.push({id:maxId+1, name, prices, image:img});
   }
   persist(); closeModal(); renderDrinksAdmin();
   toast(idx>=0?'تم التعديل':'تمت الإضافة','success');
@@ -1725,11 +1730,14 @@ function openDrinkKiloModal(catId, idx) {
     <div class="form-group"><label>الاسم *</label><input class="form-control" id="dk_name" value="${item?escapeHTML(item.name):''}"/></div>
     ${kiloSizes.map((s,i)=>`
       <div class="form-group"><label>${escapeHTML(s)} (ل.ل) *</label>
-        <input class="form-control" id="dk_p${i}" type="number" value="${item?item.prices[i]:''}"/></div>`).join('')}`;
+        <input class="form-control" id="dk_p${i}" type="number" value="${item&&item.prices?item.prices[i]:''}"/></div>`).join('')}
+    <div class="form-group">${imgFieldHTML('dk_img','dk_preview','الصورة')}</div>`;
   document.getElementById('modalFooter').innerHTML = `
     <button class="btn btn-primary" onclick="saveDrinkKilo(${catId},${idx!==null&&idx!==undefined?idx:-1})"><i class="fas fa-save"></i> حفظ</button>
     <button class="btn btn-secondary" onclick="closeModal()">إلغاء</button>`;
   openModal();
+  attachImgUpload('dk_img','dk_preview');
+  if (item && item.image) { document.getElementById('dk_img').value = item.image; previewImg('dk_img','dk_preview'); }
 }
 
 function saveDrinkKilo(catId, idx) {
@@ -1740,9 +1748,10 @@ function saveDrinkKilo(catId, idx) {
   const kiloSizes = cat.kiloSizes||['نصف كيلو','كيلو'];
   const prices = kiloSizes.map((_,i)=>parseInt(document.getElementById(`dk_p${i}`).value)||0);
   if (!name || prices.some(p=>p<=0)) { toast('أدخل جميع الحقول','error'); return; }
+  const imgK = sanitizeURL(document.getElementById('dk_img').value.trim());
   if (!cat.kiloItems) cat.kiloItems = [];
-  if (idx >= 0) { cat.kiloItems[idx] = {id:cat.kiloItems[idx].id, name, prices}; }
-  else { const maxId=(cat.kiloItems||[]).reduce((m,x)=>Math.max(m,x.id),0); cat.kiloItems.push({id:maxId+1,name,prices}); }
+  if (idx >= 0) { cat.kiloItems[idx] = {id:cat.kiloItems[idx].id, name, prices, image:imgK}; }
+  else { const maxId=(cat.kiloItems||[]).reduce((m,x)=>Math.max(m,x.id),0); cat.kiloItems.push({id:maxId+1,name,prices,image:imgK}); }
   persist(); closeModal(); renderDrinksAdmin(); toast('تم الحفظ','success');
 }
 
