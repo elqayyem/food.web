@@ -1188,6 +1188,8 @@ function saveMenuItem(id) {
   if (id) {
     const i = d.menuItems.findIndex(x=>x.id===id);
     if (i>=0) Object.assign(d.menuItems[i], {name,price,category:cat,image:img,popular:pop});
+    /* Sync image to all menuItems with the same name */
+    d.menuItems.forEach(item => { if (item.name === name && item.id !== id) item.image = img; });
   } else {
     const maxId = d.menuItems.reduce((m,x)=>Math.max(m,x.id),0);
     const maxOrd = d.menuItems.reduce((m,x)=>Math.max(m,x.order),0);
