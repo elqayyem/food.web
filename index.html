@@ -507,6 +507,58 @@
 
     .reveal { opacity: 0; transform: translateY(24px); transition: opacity .55s ease, transform .55s ease; }
     .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── FATOOR SECTION ── */
+    .fatoor-section { padding: 90px 0; background: var(--dark2); }
+
+    .fatoor-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 22px;
+    }
+
+    .fatoor-card {
+      background: var(--dark);
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--dark4);
+      transition: transform .3s, border-color .3s, box-shadow .3s;
+    }
+    .fatoor-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--gold);
+      box-shadow: 0 14px 36px rgba(232,160,32,.2);
+    }
+
+    .fatoor-card img {
+      width: 100%; height: 200px; object-fit: cover; display: block;
+    }
+
+    .fatoor-card-body { padding: 16px 18px; }
+
+    .fatoor-card-name {
+      font-size: 18px; font-weight: 900; color: #fff;
+      margin-bottom: 14px; text-align: center;
+    }
+
+    .fatoor-sizes { display: flex; flex-direction: column; gap: 8px; }
+
+    .fatoor-size-row {
+      display: flex; justify-content: space-between; align-items: center;
+      background: rgba(255,255,255,.04); border-radius: 8px;
+      padding: 8px 14px; border: 1px solid rgba(255,255,255,.06);
+    }
+
+    .fatoor-size-label {
+      font-size: 14px; font-weight: 700; color: var(--text);
+    }
+
+    .fatoor-size-price {
+      font-size: 14px; font-weight: 900; color: var(--gold);
+    }
+
+    @media (max-width: 900px) { .fatoor-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 560px) { .fatoor-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -527,6 +579,7 @@
         <li><a href="#menu">المنيو</a></li>
         <li><a href="#grills">مشاوي</a></li>
         <li><a href="#meals">وجبات</a></li>
+        <li><a href="#fatoor">فطور</a></li>
         <li><a href="#about">عن المطعم</a></li>
         <li><a href="#contact">تواصل معنا</a></li>
       </ul>
@@ -969,6 +1022,151 @@
           <div class="grill-card-body">
             <div class="grill-card-name">طاووق</div>
             <div class="grill-card-price">1300 ل.ل</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ FATOOR SECTION ══════════ -->
+  <section class="fatoor-section" id="fatoor">
+    <div class="container">
+      <div class="divider-title reveal">
+        <h2>فطور</h2>
+      </div>
+
+      <div class="fatoor-grid">
+
+        <!-- ماليزية -->
+        <div class="fatoor-card reveal">
+          <img src="https://images.unsplash.com/photo-1547592180-85f173990554?w=500&q=80" alt="ماليزية" loading="lazy" onerror="this.src='https://placehold.co/500x200?text=ماليزية'"/>
+          <div class="fatoor-card-body">
+            <div class="fatoor-card-name">🟡 ماليزية</div>
+            <div class="fatoor-sizes">
+              <div class="fatoor-size-row">
+                <span class="fatoor-size-label">صغير</span>
+                <span class="fatoor-size-price">180 ل.ل</span>
+              </div>
+              <div class="fatoor-size-row">
+                <span class="fatoor-size-label">وسط</span>
+                <span class="fatoor-size-price">250 ل.ل</span>
+              </div>
+              <div class="fatoor-size-row">
+                <span class="fatoor-size-label">كبير</span>
+                <span class="fatoor-size-price">350 ل.ل</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- فتة حمص -->
+        <div class="fatoor-card reveal">
+          <img src="https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=500&q=80" alt="فتة حمص" loading="lazy" onerror="this.src='https://placehold.co/500x200?text=فتة حمص'"/>
+          <div class="fatoor-card-body">
+            <div class="fatoor-card-name">🟤 فتة حمص</div>
+            <div class="fatoor-sizes">
+              <div class="fatoor-size-row">
+                <span class="fatoor-size-label">صغير</span>
+                <span class="fatoor-size-price">180 ل.ل</span>
+              </div>
+              <div class="fatoor-size-row">
+                <span class="fatoor-size-label">وسط</span>
+                <span class="fatoor-size-price">250 ل.ل</span>
+              </div>
+              <div class="fatoor-size-row">
+                <span class="fatoor-size-label">كبير</span>
+                <span class="fatoor-size-price">350 ل.ل</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- حمص مسبحة -->
+        <div class="fatoor-card reveal">
+          <img src="https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?w=500&q=80" alt="حمص مسبحة" loading="lazy" onerror="this.src='https://placehold.co/500x200?text=حمص مسبحة'"/>
+          <div class="fatoor-card-body">
+            <div class="fatoor-card-name">🟢 حمص مسبحة</div>
+            <div class="fatoor-sizes">
+              <div class="fatoor-size-row">
+                <span class="fatoor-size-label">صغير</span>
+                <span class="fatoor-size-price">150 ل.ل</span>
+              </div>
+              <div class="fatoor-size-row">
+                <span class="fatoor-size-label">وسط</span>
+                <span class="fatoor-size-price">200 ل.ل</span>
+              </div>
+              <div class="fatoor-size-row">
+                <span class="fatoor-size-label">كبير</span>
+                <span class="fatoor-size-price">300 ل.ل</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- فول -->
+        <div class="fatoor-card reveal">
+          <img src="https://images.unsplash.com/photo-1512058454905-6b841e7ad132?w=500&q=80" alt="فول" loading="lazy" onerror="this.src='https://placehold.co/500x200?text=فول'"/>
+          <div class="fatoor-card-body">
+            <div class="fatoor-card-name">🟠 فول</div>
+            <div class="fatoor-sizes">
+              <div class="fatoor-size-row">
+                <span class="fatoor-size-label">صغير</span>
+                <span class="fatoor-size-price">150 ل.ل</span>
+              </div>
+              <div class="fatoor-size-row">
+                <span class="fatoor-size-label">وسط</span>
+                <span class="fatoor-size-price">200 ل.ل</span>
+              </div>
+              <div class="fatoor-size-row">
+                <span class="fatoor-size-label">كبير</span>
+                <span class="fatoor-size-price">350 ل.ل</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- حمص ناعم -->
+        <div class="fatoor-card reveal">
+          <img src="https://images.unsplash.com/photo-1593001872095-7d5b3868fb1f?w=500&q=80" alt="حمص ناعم" loading="lazy" onerror="this.src='https://placehold.co/500x200?text=حمص ناعم'"/>
+          <div class="fatoor-card-body">
+            <div class="fatoor-card-name">🟣 حمص ناعم</div>
+            <div class="fatoor-sizes">
+              <div class="fatoor-size-row">
+                <span class="fatoor-size-label">صغير</span>
+                <span class="fatoor-size-price">150 ل.ل</span>
+              </div>
+              <div class="fatoor-size-row">
+                <span class="fatoor-size-label">وسط</span>
+                <span class="fatoor-size-price">200 ل.ل</span>
+              </div>
+              <div class="fatoor-size-row">
+                <span class="fatoor-size-label">كبير</span>
+                <span class="fatoor-size-price">350 ل.ل</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- حمص ناعم بلحمة -->
+        <div class="fatoor-card reveal">
+          <img src="https://images.unsplash.com/photo-1529059997568-3d847b1154f0?w=500&q=80" alt="حمص ناعم بلحمة" loading="lazy" onerror="this.src='https://placehold.co/500x200?text=حمص بلحمة'"/>
+          <div class="fatoor-card-body">
+            <div class="fatoor-card-name">🔴 حمص ناعم بلحمة</div>
+            <div class="fatoor-sizes">
+              <div class="fatoor-size-row">
+                <span class="fatoor-size-label">صغير</span>
+                <span class="fatoor-size-price">350 ل.ل</span>
+              </div>
+              <div class="fatoor-size-row">
+                <span class="fatoor-size-label">وسط</span>
+                <span class="fatoor-size-price">400 ل.ل</span>
+              </div>
+              <div class="fatoor-size-row">
+                <span class="fatoor-size-label">كبير</span>
+                <span class="fatoor-size-price">650 ل.ل</span>
+              </div>
+            </div>
           </div>
         </div>
 
