@@ -1352,6 +1352,33 @@
   </footer>
 
 
+  <!-- ══ CART BUTTON ══ -->
+  <button id="_cartBtn" onclick="toggleCart()">
+    <i class="fas fa-shopping-cart"></i>
+    السلة
+    <span id="_cartBadge">0</span>
+  </button>
+
+  <!-- ══ CART SHEET ══ -->
+  <div id="_cartOverlay" onclick="toggleCart()"></div>
+  <div id="_cartSheet">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h3 style="color:#fff;margin:0;font-size:18px">🛒 سلة الطلبات</h3>
+      <button onclick="toggleCart()" style="background:none;border:none;color:#aaa;font-size:24px;cursor:pointer;line-height:1">✕</button>
+    </div>
+    <div id="_cartItems"><p style="text-align:center;color:var(--muted);padding:30px 0">السلة فارغة</p></div>
+    <div style="border-top:1px solid #2a2a3e;padding-top:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+        <span style="color:#aaa;font-size:14px">المجموع:</span>
+        <span id="_cartTotal" style="color:var(--gold);font-size:22px;font-weight:900">0 ل.ل</span>
+      </div>
+      <button id="_cartSendBtn" onclick="sendOrder()">
+        <i class="fab fa-whatsapp" style="font-size:20px"></i>
+        تم — أرسل الطلب عبر واتساب
+      </button>
+    </div>
+  </div>
+
   <!-- WhatsApp float -->
   <a href="https://wa.me/9613280613" class="wa-float" target="_blank" rel="noopener noreferrer" aria-label="تواصل عبر واتساب">
     <i class="fab fa-whatsapp"></i>
@@ -1431,6 +1458,97 @@
   <!-- Site loader: applies admin changes from localStorage -->
   <script src="js/site-loader.js"></script>
 
+  <script>
+    /* ══════════ CART ══════════ */
+    const _cart = {};
+
+    function cartChange(name, price, delta) {
+      if (!_cart[name]) _cart[name] = { name, price, qty: 0 };
+      _cart[name].qty = Math.max(0, _cart[name].qty + delta);
+      if (_cart[name].qty === 0) delete _cart[name];
+      syncCartQty();
+      _renderCartPanel();
+    }
+
+    window.syncCartQty = function () {
+      document.querySelectorAll('[data-item-qty]').forEach(el => {
+        const qty = (_cart[el.dataset.itemQty] || {}).qty || 0;
+        el.textContent = qty;
+      });
+    };
+
+    function _renderCartPanel() {
+      const items = Object.values(_cart);
+      const count = items.reduce((s, i) => s + i.qty, 0);
+      const total = items.reduce((s, i) => s + i.price * i.qty, 0);
+
+      const btn = document.getElementById('_cartBtn');
+      document.getElementById('_cartBadge').textContent = count;
+      btn.style.display = count > 0 ? 'flex' : 'none';
+      document.getElementById('_cartTotal').textContent = total.toLocaleString() + ' ل.ل';
+
+      const itemsEl = document.getElementById('_cartItems');
+      if (!items.length) {
+        itemsEl.innerHTML = '<p style="text-align:center;color:var(--muted);padding:30px 0">السلة فارغة</p>';
+        return;
+      }
+      itemsEl.innerHTML = items.map(i => `
+        <div class="cart-row">
+          <span class="cart-row-name">${i.name}</span>
+          <div class="cart-row-ctrl">
+            <button class="cart-btn minus" data-action="cart" data-delta="-1" data-name="${i.name}" data-price="${i.price}">−</button>
+            <span>${i.qty}</span>
+            <button class="cart-btn plus" data-action="cart" data-delta="1" data-name="${i.name}" data-price="${i.price}">+</button>
+          </div>
+          <span class="cart-row-price">${(i.price * i.qty).toLocaleString()} ل.ل</span>
+        </div>`).join('');
+    }
+
+    function toggleCart() {
+      const sheet = document.getElementById('_cartSheet');
+      const overlay = document.getElementById('_cartOverlay');
+      const open = sheet.classList.toggle('open');
+      overlay.style.display = open ? 'block' : 'none';
+    }
+
+    function sendOrder() {
+      const items = Object.values(_cart);
+      if (!items.length) { return; }
+      const total = items.reduce((s, i) => s + i.price * i.qty, 0);
+      let msg = '🍽️ *طلبي من مطعم فول وحمص:*\n\n';
+      items.forEach(i => { msg += `• ${i.name} × ${i.qty} = ${(i.price * i.qty).toLocaleString()} ل.ل\n`; });
+      msg += `\n💰 *المجموع: ${total.toLocaleString()} ل.ل*`;
+      const waNum = document.querySelector('a[href*="wa.me"]')?.href?.match(/wa\.me\/(\d+)/)?.[1] || '9613280613';
+      window.open(`https://wa.me/${waNum}?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
+    /* Event delegation for cart buttons (works for dynamic cards too) */
+    document.addEventListener('click', e => {
+      const btn = e.target.closest('[data-action="cart"]');
+      if (!btn) return;
+      cartChange(btn.dataset.name, Number(btn.dataset.price), Number(btn.dataset.delta));
+    });
+
+    /* Inject cart buttons into static HTML cards (fallback when no Supabase data) */
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.menu-card, .grill-card').forEach(card => {
+        if (card.querySelector('.cart-controls')) return;
+        const name = card.dataset.name;
+        const priceEl = card.querySelector('.card-price, .grill-card-price');
+        if (!name || !priceEl) return;
+        const price = parseInt(priceEl.textContent.replace(/[^0-9]/g, '')) || 0;
+        if (!price) return;
+        const div = document.createElement('div');
+        div.className = 'cart-controls';
+        div.innerHTML = `
+          <button class="cart-btn minus" data-action="cart" data-delta="-1" data-name="${name}" data-price="${price}">−</button>
+          <span class="cart-qty" data-item-qty="${name}">0</span>
+          <button class="cart-btn plus" data-action="cart" data-delta="1" data-name="${name}" data-price="${price}">+</button>`;
+        card.appendChild(div);
+      });
+    });
+  </script>
+
   <!-- ══════════ LIGHTBOX ══════════ -->
   <div id="lightbox" onclick="closeLightbox()" style="
     display:none; position:fixed; inset:0; z-index:9999;
@@ -1451,6 +1569,32 @@
   <style>
     #lightbox { animation: lbIn 0.2s ease; }
     @keyframes lbIn { from { opacity:0 } to { opacity:1 } }
+
+    /* ── Cart controls ── */
+    .cart-controls { display:flex; align-items:center; justify-content:center; gap:18px; padding:10px 14px; border-top:1px solid var(--dark4); background:rgba(0,0,0,.15); }
+    .cart-btn { width:34px; height:34px; border-radius:50%; border:none; cursor:pointer; font-size:20px; font-weight:900; display:flex; align-items:center; justify-content:center; transition:.15s; line-height:1; flex-shrink:0; }
+    .cart-btn:active { transform:scale(.82); }
+    .cart-btn.plus { background:var(--red); color:#fff; }
+    .cart-btn.minus { background:var(--dark4); color:#aaa; }
+    .cart-qty { font-size:16px; font-weight:900; color:#fff; min-width:24px; text-align:center; }
+
+    /* ── Floating cart button ── */
+    #_cartBtn { display:none; position:fixed; bottom:90px; left:50%; transform:translateX(-50%); z-index:997; background:var(--red); color:#fff; border:none; border-radius:30px; padding:13px 28px; cursor:pointer; font-size:15px; font-weight:800; box-shadow:0 6px 28px rgba(200,16,46,.55); align-items:center; gap:10px; white-space:nowrap; }
+    #_cartBadge { background:#fff; color:var(--red); border-radius:50%; width:22px; height:22px; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:900; }
+
+    /* ── Cart bottom sheet ── */
+    #_cartOverlay { display:none; position:fixed; inset:0; z-index:9000; background:rgba(0,0,0,.7); }
+    #_cartSheet { position:fixed; bottom:0; left:0; right:0; z-index:9001; background:#1c1c2e; border-radius:20px 20px 0 0; padding:20px 20px 30px; max-height:80vh; display:flex; flex-direction:column; transform:translateY(100%); transition:transform .35s cubic-bezier(.4,0,.2,1); }
+    #_cartSheet.open { transform:translateY(0); }
+    #_cartItems { flex:1; overflow-y:auto; margin:12px 0; }
+    .cart-row { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid #2a2a3e; }
+    .cart-row-name { flex:1; font-size:14px; font-weight:700; color:#fff; }
+    .cart-row-price { color:var(--gold); font-weight:800; font-size:13px; min-width:70px; text-align:left; }
+    .cart-row-ctrl { display:flex; align-items:center; gap:8px; }
+    .cart-row-ctrl button { width:28px; height:28px; font-size:16px; }
+    .cart-row-ctrl span { font-size:14px; font-weight:900; color:#fff; min-width:18px; text-align:center; }
+    #_cartSendBtn { width:100%; padding:15px; background:var(--red); color:#fff; border:none; border-radius:14px; font-size:16px; font-weight:900; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; margin-top:14px; }
+    #_cartSendBtn:hover { opacity:.9; }
   </style>
 
   <script>
