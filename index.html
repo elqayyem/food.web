@@ -1432,5 +1432,48 @@
 
   <!-- Site loader: applies admin changes from localStorage -->
   <script src="js/site-loader.js"></script>
+
+  <!-- ══════════ LIGHTBOX ══════════ -->
+  <div id="lightbox" onclick="closeLightbox()" style="
+    display:none; position:fixed; inset:0; z-index:9999;
+    background:rgba(0,0,0,0.92); align-items:center; justify-content:center;
+    cursor:zoom-out; padding:16px;
+  ">
+    <button onclick="closeLightbox()" style="
+      position:absolute; top:16px; left:16px;
+      background:none; border:none; color:#fff; font-size:28px;
+      cursor:pointer; line-height:1; padding:4px 10px;
+    ">✕</button>
+    <img id="lightboxImg" src="" alt="" onclick="event.stopPropagation()" style="
+      max-width:100%; max-height:100%; object-fit:contain;
+      border-radius:10px; box-shadow:0 8px 40px rgba(0,0,0,0.6);
+    " />
+  </div>
+
+  <style>
+    #lightbox { animation: lbIn 0.2s ease; }
+    @keyframes lbIn { from { opacity:0 } to { opacity:1 } }
+  </style>
+
+  <script>
+    function openLightbox(src, alt) {
+      const lb = document.getElementById('lightbox');
+      const img = document.getElementById('lightboxImg');
+      img.src = src.replace(/w=\d+/, 'w=1200');
+      img.alt = alt || '';
+      lb.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+    function closeLightbox() {
+      document.getElementById('lightbox').style.display = 'none';
+      document.body.style.overflow = '';
+    }
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+    document.querySelectorAll('img[src^="http"]').forEach(img => {
+      img.style.cursor = 'zoom-in';
+      img.addEventListener('click', () => openLightbox(img.src, img.alt));
+    });
+  </script>
 </body>
 </html>
