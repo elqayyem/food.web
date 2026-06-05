@@ -459,6 +459,8 @@ tr.dragging{opacity:.4}
         <button class="nav-item" onclick="showPage('menu',this)"><i class="fas fa-utensils"></i> المنيو</button>
         <button class="nav-item" onclick="showPage('meals',this)"><i class="fas fa-bowl-food"></i> الوجبات</button>
         <button class="nav-item" onclick="showPage('grills',this)"><i class="fas fa-fire"></i> المشاوي</button>
+        <button class="nav-item" onclick="showPage('offers',this)"><i class="fas fa-tag"></i> العروضات</button>
+        <button class="nav-item" onclick="showPage('mansaf',this)"><i class="fas fa-bowl-rice"></i> المناسف</button>
         <button class="nav-item" onclick="showPage('fatoor',this)"><i class="fas fa-mug-hot"></i> الفطور</button>
         <button class="nav-item" onclick="showPage('drinks',this)"><i class="fas fa-glass-water"></i> الأشربة</button>
         <button class="nav-item" onclick="showPage('content',this)"><i class="fas fa-pen-to-square"></i> النصوص</button>
@@ -571,6 +573,30 @@ tr.dragging{opacity:.4}
               </table>
             </div>
           </div>
+        </div>
+
+        <!-- ── OFFERS ── -->
+        <div id="sec-offers" class="dash-section">
+          <div class="page-header">
+            <h2><i class="fas fa-tag" style="color:var(--red)"></i> إدارة العروضات</h2>
+            <button class="btn btn-primary" onclick="openOfferModal(0)"><i class="fas fa-plus"></i> إضافة عرض</button>
+          </div>
+          <div class="card"><div class="tbl-wrap"><table>
+            <thead><tr><th>الصورة</th><th>الاسم</th><th>الوصف</th><th>السعر</th><th>إجراءات</th></tr></thead>
+            <tbody id="offersTbody"></tbody>
+          </table></div></div>
+        </div>
+
+        <!-- ── MANSAF ── -->
+        <div id="sec-mansaf" class="dash-section">
+          <div class="page-header">
+            <h2><i class="fas fa-bowl-rice" style="color:var(--red)"></i> إدارة المناسف</h2>
+            <button class="btn btn-primary" onclick="openMansafModal(0)"><i class="fas fa-plus"></i> إضافة منسف</button>
+          </div>
+          <div class="card"><div class="tbl-wrap"><table>
+            <thead><tr><th>الصورة</th><th>الاسم</th><th>صغير</th><th>كبير</th><th>الترتيب</th><th>إجراءات</th></tr></thead>
+            <tbody id="mansafTbody"></tbody>
+          </table></div></div>
         </div>
 
         <!-- ── DRINKS ── -->
@@ -742,6 +768,17 @@ const DEFAULTS = {
     {id:5,name:'طاووق',price:1300,image:'https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=400&q=80',popular:false}
   ],
   orders:[],
+  offers:[
+    {id:1,name:'عرض 1',description:'وصف العرض الأول — عدّله من لوحة التحكم',price:0,image:'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=80'},
+    {id:2,name:'عرض 2',description:'وصف العرض الثاني — عدّله من لوحة التحكم',price:0,image:'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&q=80'}
+  ],
+  mansaf:[
+    {id:1,name:'منسف كريسبي', image:'',sizes:[{label:'صغير',price:0},{label:'كبير',price:0}]},
+    {id:2,name:'منسف فروج غاز',image:'',sizes:[{label:'صغير',price:0},{label:'كبير',price:0}]},
+    {id:3,name:'منسف فروج فحم',image:'',sizes:[{label:'صغير',price:0},{label:'كبير',price:0}]},
+    {id:4,name:'منسف لحمي',    image:'',sizes:[{label:'صغير',price:0},{label:'كبير',price:0}]},
+    {id:5,name:'منسف كفتة',    image:'',sizes:[{label:'صغير',price:0},{label:'كبير',price:0}]}
+  ],
   drinks:[
     {id:1,name:'عصائر',nameEn:'JUICES',icon:'🥤',sizes:['صغير','وسط','كبير'],items:[
       {id:1,name:'موز حليب مع قشطة',prices:[150,200,250]},
@@ -869,6 +906,8 @@ function validateData(d) {
   if (!Array.isArray(d.grills))    d.grills    = def.grills;
   if (!Array.isArray(d.fatoor))    d.fatoor    = def.fatoor;
   if (!Array.isArray(d.orders))    d.orders    = [];
+  if (!Array.isArray(d.offers))    d.offers    = def.offers;
+  if (!Array.isArray(d.mansaf))    d.mansaf    = def.mansaf;
   if (!Array.isArray(d.drinks))    d.drinks    = def.drinks;
   if (!d.hero)    d.hero    = def.hero;
   if (!d.navbar)  d.navbar  = def.navbar;
@@ -1068,7 +1107,7 @@ document.getElementById('loginUser').addEventListener('keydown', e => { if(e.key
 ════════════════════════════════════════════════ */
 const PAGE_TITLES = {
   overview:'لوحة التحكم', menu:'إدارة المنيو', meals:'إدارة الوجبات',
-  grills:'إدارة المشاوي', fatoor:'إدارة الفطور', drinks:'إدارة الأشربة', content:'تعديل النصوص',
+  grills:'إدارة المشاوي', offers:'إدارة العروضات', mansaf:'إدارة المناسف', fatoor:'إدارة الفطور', drinks:'إدارة الأشربة', content:'تعديل النصوص',
   design:'إعدادات التصميم', contact:'معلومات التواصل',
   media:'مكتبة الصور', orders:'الطلبات', settings:'الإعدادات'
 };
@@ -1083,7 +1122,7 @@ function showPage(id, btn) {
   // Lazy render each section
   const renderers = {
     overview: renderOverview, menu: renderMenuTable, meals: renderMeals,
-    grills: renderGrills, fatoor: renderFatoor, drinks: renderDrinksAdmin, content: renderContent,
+    grills: renderGrills, offers: renderOffers, mansaf: renderMansaf, fatoor: renderFatoor, drinks: renderDrinksAdmin, content: renderContent,
     design: renderDesign, contact: renderContact, media: renderMedia,
     orders: renderOrders, settings: renderSettings
   };
@@ -1607,6 +1646,154 @@ function moveFatoor(id, dir) {
   if (swapIdx<0||swapIdx>=d.fatoor.length) return;
   [d.fatoor[idx],d.fatoor[swapIdx]] = [d.fatoor[swapIdx],d.fatoor[idx]];
   persist(); renderFatoor();
+}
+
+/* ════════════════════════════════════════════════
+   OFFERS MANAGEMENT
+════════════════════════════════════════════════ */
+function renderOffers() {
+  const d = getData();
+  const items = d.offers || [];
+  document.getElementById('offersTbody').innerHTML = items.length ? items.map(item => `
+    <tr>
+      <td><img class="td-img" src="${sanitizeURL(item.image||'')}" onerror="this.src='https://placehold.co/50'" style="${item.image?'':'opacity:.3'}"/></td>
+      <td style="font-weight:700">${escapeHTML(item.name)}</td>
+      <td style="color:var(--muted);font-size:13px">${escapeHTML(item.description||'')}</td>
+      <td style="color:var(--gold);font-weight:800">${item.price?Number(item.price).toLocaleString()+' ل.ل':'—'}</td>
+      <td><div class="td-actions">
+        <button class="btn btn-sm btn-info" onclick="openOfferModal(${item.id})"><i class="fas fa-pen"></i></button>
+        <button class="btn btn-sm btn-danger" onclick="deleteOffer(${item.id})"><i class="fas fa-trash"></i></button>
+      </div></td>
+    </tr>`).join('')
+  : '<tr><td colspan="5"><div class="empty-state"><i class="fas fa-tag"></i><p>لا توجد عروضات</p></div></td></tr>';
+}
+
+function openOfferModal(id) {
+  const d = getData();
+  const item = id ? (d.offers||[]).find(x=>x.id===id) : null;
+  document.getElementById('modalTitle').textContent = item ? 'تعديل العرض' : 'إضافة عرض';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="form-group"><label>اسم العرض *</label><input class="form-control" id="of_name" value="${escapeHTML(item?.name||'')}"/></div>
+    <div class="form-group"><label>الوصف</label><textarea class="form-control" id="of_desc">${escapeHTML(item?.description||'')}</textarea></div>
+    <div class="form-group"><label>السعر (ل.ل)</label><input class="form-control" id="of_price" type="number" value="${item?.price||''}"/></div>
+    <div class="form-group">${imgFieldHTML('of_img','of_preview','صورة العرض')}</div>`;
+  document.getElementById('modalFooter').innerHTML = `
+    <button class="btn btn-primary" onclick="saveOffer(${id||0})"><i class="fas fa-save"></i> حفظ</button>
+    <button class="btn btn-secondary" onclick="closeModal()">إلغاء</button>`;
+  openModal();
+  attachImgUpload('of_img','of_preview');
+  if (item?.image) { document.getElementById('of_img').value = item.image; previewImg('of_img','of_preview'); }
+}
+
+function saveOffer(id) {
+  const name = sanitizeInput(document.getElementById('of_name').value, 100);
+  if (!name) { toast('أدخل اسم العرض','error'); return; }
+  const description = sanitizeInput(document.getElementById('of_desc').value, 300);
+  const price = parseInt(document.getElementById('of_price').value)||0;
+  const img = sanitizeURL(document.getElementById('of_img').value.trim());
+  const d = getData();
+  if (!d.offers) d.offers = [];
+  if (id) {
+    const i = d.offers.findIndex(x=>x.id===id);
+    if (i>=0) Object.assign(d.offers[i], {name,description,price,image:img});
+  } else {
+    const maxId = d.offers.reduce((m,x)=>Math.max(m,x.id),0);
+    d.offers.push({id:maxId+1,name,description,price,image:img});
+  }
+  persist(); closeModal(); renderOffers();
+  toast(id?'تم التعديل':'تمت الإضافة','success');
+}
+
+function deleteOffer(id) {
+  confirm_('حذف هذا العرض؟', ()=>{
+    const d = getData();
+    d.offers = (d.offers||[]).filter(x=>x.id!==id);
+    persist(); renderOffers(); toast('تم الحذف','success');
+  });
+}
+
+/* ════════════════════════════════════════════════
+   MANSAF MANAGEMENT
+════════════════════════════════════════════════ */
+function renderMansaf() {
+  const d = getData();
+  const items = d.mansaf || [];
+  document.getElementById('mansafTbody').innerHTML = items.length ? items.map(item => {
+    const get = label => (item.sizes||[]).find(x=>x.label===label)?.price || '—';
+    return `
+    <tr>
+      <td><img class="td-img" src="${sanitizeURL(item.image||'')}" onerror="this.src='https://placehold.co/50'" style="${item.image?'':'opacity:.3'}"/></td>
+      <td style="font-weight:700">${escapeHTML(item.name)}</td>
+      <td style="color:var(--gold);font-weight:700">${Number(get('صغير')).toLocaleString()} ل.ل</td>
+      <td style="color:var(--gold);font-weight:700">${Number(get('كبير')).toLocaleString()} ل.ل</td>
+      <td><div style="display:flex;gap:4px">
+        <button class="btn btn-sm btn-secondary" onclick="moveMansaf(${item.id},-1)"><i class="fas fa-arrow-up"></i></button>
+        <button class="btn btn-sm btn-secondary" onclick="moveMansaf(${item.id},1)"><i class="fas fa-arrow-down"></i></button>
+      </div></td>
+      <td><div class="td-actions">
+        <button class="btn btn-sm btn-info" onclick="openMansafModal(${item.id})"><i class="fas fa-pen"></i></button>
+        <button class="btn btn-sm btn-danger" onclick="deleteMansaf(${item.id})"><i class="fas fa-trash"></i></button>
+      </div></td>
+    </tr>`}).join('')
+  : '<tr><td colspan="6"><div class="empty-state"><i class="fas fa-bowl-rice"></i><p>لا توجد مناسف</p></div></td></tr>';
+}
+
+function openMansafModal(id) {
+  const d = getData();
+  const item = id ? (d.mansaf||[]).find(x=>x.id===id) : null;
+  const get = label => (item?.sizes||[]).find(x=>x.label===label)?.price || '';
+  document.getElementById('modalTitle').textContent = item ? 'تعديل المنسف' : 'إضافة منسف';
+  document.getElementById('modalBody').innerHTML = `
+    <div class="form-group"><label>الاسم *</label><input class="form-control" id="mn_name" value="${escapeHTML(item?.name||'')}"/></div>
+    <div class="form-row">
+      <div class="form-group"><label>صغير (ل.ل) *</label><input class="form-control" id="mn_s" type="number" value="${get('صغير')}"/></div>
+      <div class="form-group"><label>كبير (ل.ل) *</label><input class="form-control" id="mn_l" type="number" value="${get('كبير')}"/></div>
+    </div>
+    <div class="form-group">${imgFieldHTML('mn_img','mn_preview','الصورة')}</div>`;
+  document.getElementById('modalFooter').innerHTML = `
+    <button class="btn btn-primary" onclick="saveMansaf(${id||0})"><i class="fas fa-save"></i> حفظ</button>
+    <button class="btn btn-secondary" onclick="closeModal()">إلغاء</button>`;
+  openModal();
+  attachImgUpload('mn_img','mn_preview');
+  if (item?.image) { document.getElementById('mn_img').value = item.image; previewImg('mn_img','mn_preview'); }
+}
+
+function saveMansaf(id) {
+  const name = sanitizeInput(document.getElementById('mn_name').value, 100);
+  if (!name) { toast('أدخل اسم المنسف','error'); return; }
+  const s = parseInt(document.getElementById('mn_s').value)||0;
+  const l = parseInt(document.getElementById('mn_l').value)||0;
+  const img = sanitizeURL(document.getElementById('mn_img').value.trim());
+  const sizes = [{label:'صغير',price:s},{label:'كبير',price:l}];
+  const d = getData();
+  if (!d.mansaf) d.mansaf = [];
+  if (id) {
+    const i = d.mansaf.findIndex(x=>x.id===id);
+    if (i>=0) Object.assign(d.mansaf[i], {name,image:img,sizes});
+  } else {
+    const maxId = d.mansaf.reduce((m,x)=>Math.max(m,x.id),0);
+    d.mansaf.push({id:maxId+1,name,image:img,sizes});
+  }
+  persist(); closeModal(); renderMansaf();
+  toast(id?'تم التعديل':'تمت الإضافة','success');
+}
+
+function deleteMansaf(id) {
+  confirm_('حذف هذا المنسف؟', ()=>{
+    const d = getData();
+    d.mansaf = (d.mansaf||[]).filter(x=>x.id!==id);
+    persist(); renderMansaf(); toast('تم الحذف','success');
+  });
+}
+
+function moveMansaf(id, dir) {
+  const d = getData();
+  if (!d.mansaf) return;
+  const idx = d.mansaf.findIndex(x=>x.id===id);
+  const swapIdx = idx+dir;
+  if (swapIdx<0||swapIdx>=d.mansaf.length) return;
+  [d.mansaf[idx],d.mansaf[swapIdx]] = [d.mansaf[swapIdx],d.mansaf[idx]];
+  persist(); renderMansaf();
 }
 
 /* ════════════════════════════════════════════════

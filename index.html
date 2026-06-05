@@ -581,6 +581,24 @@
     .drinks-kilo-title { font-size: 15px; font-weight: 800; color: var(--gold); margin-bottom: 12px; }
     @media (max-width: 900px) { .drinks-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 560px) { .drinks-grid { grid-template-columns: 1fr; } }
+
+    /* ── OFFERS SECTION ── */
+    .offers-section { padding: 90px 0; background: var(--dark3); }
+    .offers-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 28px; }
+    .offer-card { background: var(--dark); border-radius: 18px; overflow: hidden; border: 1px solid var(--dark4); transition: transform .3s, border-color .3s, box-shadow .3s; }
+    .offer-card:hover { transform: translateY(-6px); border-color: var(--red); box-shadow: 0 14px 36px rgba(200,16,46,.25); }
+    .offer-card img { width: 100%; height: 220px; object-fit: cover; display: block; }
+    .offer-card-body { padding: 20px 22px; }
+    .offer-card-name { font-size: 20px; font-weight: 900; color: #fff; margin-bottom: 8px; }
+    .offer-card-desc { font-size: 14px; color: var(--muted); margin-bottom: 14px; line-height: 1.6; }
+    .offer-card-price { display: inline-block; background: var(--red); color: #fff; font-size: 16px; font-weight: 900; padding: 6px 18px; border-radius: 30px; }
+    @media (max-width: 700px) { .offers-grid { grid-template-columns: 1fr; } }
+
+    /* ── MANSAF SECTION ── */
+    .mansaf-section { padding: 90px 0; background: var(--dark); }
+    .mansaf-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 22px; }
+    @media (max-width: 900px) { .mansaf-grid { grid-template-columns: repeat(2,1fr); } }
+    @media (max-width: 560px) { .mansaf-grid { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -601,6 +619,8 @@
         <li><a href="#menu">المنيو</a></li>
         <li><a href="#grills">مشاوي</a></li>
         <li><a href="#meals">وجبات</a></li>
+        <li><a href="#offers">عروضات</a></li>
+        <li><a href="#mansaf">مناسف</a></li>
         <li><a href="#fatoor">فطور</a></li>
         <li><a href="#drinks">أشربة</a></li>
         <li><a href="#about">عن المطعم</a></li>
@@ -1053,6 +1073,28 @@
   </section>
 
   <!-- ══════════ FATOOR SECTION ══════════ -->
+  <!-- ══════════ OFFERS SECTION ══════════ -->
+  <section class="offers-section" id="offers">
+    <div class="container">
+      <div class="sec-head reveal">
+        <h2>🎁 عروضاتنا</h2>
+        <p>أفضل العروض والأسعار الخاصة</p>
+      </div>
+      <div class="offers-grid" id="offersGrid"></div>
+    </div>
+  </section>
+
+  <!-- ══════════ MANSAF SECTION ══════════ -->
+  <section class="mansaf-section" id="mansaf">
+    <div class="container">
+      <div class="sec-head reveal">
+        <h2>🍚 مناسفنا</h2>
+        <p>مناسف شهية بأحجام مختلفة</p>
+      </div>
+      <div class="mansaf-grid" id="mansafGrid"></div>
+    </div>
+  </section>
+
   <section class="fatoor-section" id="fatoor">
     <div class="container">
       <div class="divider-title reveal">

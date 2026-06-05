@@ -177,6 +177,45 @@
     attachReveal(row.querySelectorAll('.reveal'));
   }
 
+  /* ── Render offers section ── */
+  function renderOffers(offers) {
+    const grid = document.getElementById('offersGrid');
+    if (!grid || !offers || !offers.length) return;
+    grid.innerHTML = offers.map(offer => `
+      <div class="offer-card reveal">
+        <img src="${sanitizeURL(offer.image)}" alt="${escapeHTML(offer.name)}" loading="lazy"
+             onerror="this.src='https://placehold.co/600x220?text=Image'"/>
+        <div class="offer-card-body">
+          <div class="offer-card-name">${escapeHTML(offer.name)}</div>
+          <div class="offer-card-desc">${escapeHTML(offer.description||'')}</div>
+          ${offer.price ? `<span class="offer-card-price">${Number(offer.price).toLocaleString()} ل.ل</span>` : ''}
+        </div>
+      </div>`).join('');
+    attachReveal(grid.querySelectorAll('.reveal'));
+  }
+
+  /* ── Render mansaf section ── */
+  function renderMansaf(items) {
+    const grid = document.getElementById('mansafGrid');
+    if (!grid || !items || !items.length) return;
+    grid.innerHTML = items.map(item => `
+      <div class="fatoor-card reveal">
+        <img src="${sanitizeURL(item.image)}" alt="${escapeHTML(item.name)}" loading="lazy"
+             onerror="this.src='https://placehold.co/500x200?text=Image'"/>
+        <div class="fatoor-card-body">
+          <div class="fatoor-card-name">${escapeHTML(item.name)}</div>
+          <div class="fatoor-sizes">
+            ${(item.sizes||[]).map(s => `
+              <div class="fatoor-size-row">
+                <span class="fatoor-size-label">${escapeHTML(s.label)}</span>
+                <span class="fatoor-size-price">${Number(s.price).toLocaleString()} ل.ل</span>
+              </div>`).join('')}
+          </div>
+        </div>
+      </div>`).join('');
+    attachReveal(grid.querySelectorAll('.reveal'));
+  }
+
   /* ── Render fatoor section ── */
   function renderFatoor(items) {
     const grid = document.getElementById('fatoorGrid');
@@ -353,6 +392,8 @@
     if (d.meals)     renderMeals(d.meals);
     if (d.grills)    renderGrills(d.grills);
     if (d.features)  renderFeatures(d.features);
+    if (d.offers)    renderOffers(d.offers);
+    if (d.mansaf)    renderMansaf(d.mansaf);
     if (d.fatoor)    renderFatoor(d.fatoor);
     if (d.drinks)    renderDrinks(d.drinks);
   }
