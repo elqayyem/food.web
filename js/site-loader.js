@@ -20,16 +20,23 @@
       const rows = await res.json();
       const data = rows[0]?.data;
       if (data && Object.keys(data).length) {
-        /* Cache locally for offline fallback */
-        localStorage.setItem('restaurantData', JSON.stringify(data));
+        /* Cache with timestamp for staleness check */
+        localStorage.setItem('restaurantData', JSON.stringify({ data, ts: Date.now() }));
         return data;
       }
     } catch (e) { /* network error — fall through to cache */ }
 
-    /* Fallback: localStorage cache */
+    /* Fallback: localStorage cache (max 24h old) */
     try {
       const raw = localStorage.getItem('restaurantData');
-      return raw ? JSON.parse(raw) : null;
+      if (!raw) return null;
+      const cached = JSON.parse(raw);
+      /* Support both old format (plain object) and new format ({data, ts}) */
+      if (cached && cached.data && cached.ts) {
+        if (Date.now() - cached.ts < 24 * 60 * 60 * 1000) return cached.data;
+        return null; /* cache expired */
+      }
+      return cached; /* old format fallback */
     } catch (e) { return null; }
   }
 
