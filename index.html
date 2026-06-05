@@ -1470,10 +1470,17 @@
     }
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
 
-    document.querySelectorAll('img[src^="http"]').forEach(img => {
-      img.style.cursor = 'zoom-in';
-      img.addEventListener('click', () => openLightbox(img.src, img.alt));
+    /* Event delegation — works even after site-loader.js replaces grid HTML */
+    document.addEventListener('click', e => {
+      const img = e.target.closest('img');
+      if (!img || !img.src.startsWith('http') || img.id === 'lightboxImg') return;
+      openLightbox(img.src, img.alt);
     });
+
+    /* Add zoom cursor via CSS so it applies to dynamically rendered images too */
+    const style = document.createElement('style');
+    style.textContent = 'img[src^="http"]:not(#lightboxImg){cursor:zoom-in}';
+    document.head.appendChild(style);
   </script>
 </body>
 </html>
