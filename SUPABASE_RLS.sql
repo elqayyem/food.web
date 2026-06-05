@@ -63,7 +63,35 @@ CREATE POLICY "admin_can_insert"
 -- ══════════════════════════════════════════════════════════
 
 
--- STEP 7: Verify RLS is working
+-- ══════════════════════════════════════════════════════════
+-- STEP 7: Storage bucket policies for "restaurant-images"
+-- Run these so authenticated admins can upload images and
+-- the public can view them.
+-- ══════════════════════════════════════════════════════════
+
+-- Allow authenticated admins to upload images
+CREATE POLICY "admin_can_upload_images"
+  ON storage.objects
+  FOR INSERT
+  TO authenticated
+  WITH CHECK (bucket_id = 'restaurant-images');
+
+-- Allow everyone to view images (needed to display them on the site)
+CREATE POLICY "public_can_view_images"
+  ON storage.objects
+  FOR SELECT
+  TO anon, authenticated
+  USING (bucket_id = 'restaurant-images');
+
+-- Allow authenticated admins to delete images
+CREATE POLICY "admin_can_delete_images"
+  ON storage.objects
+  FOR DELETE
+  TO authenticated
+  USING (bucket_id = 'restaurant-images');
+
+
+-- STEP 8: Verify RLS is working
 -- Run these to confirm the policies are active:
 SELECT schemaname, tablename, rowsecurity
 FROM pg_tables
