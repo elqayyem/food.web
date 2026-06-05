@@ -1352,6 +1352,12 @@
   </footer>
 
 
+  <!-- ══ DONE BUTTON (fixed bottom-right) ══ -->
+  <button id="_doneBtn" onclick="sendOrder()">
+    <i class="fab fa-whatsapp" style="font-size:18px"></i>
+    تم — أرسل الطلب
+  </button>
+
   <!-- ══ CART BUTTON ══ -->
   <button id="_cartBtn" onclick="toggleCart()">
     <i class="fas fa-shopping-cart"></i>
@@ -1462,31 +1468,38 @@
     /* ══════════ CART ══════════ */
     const _cart = {};
 
-    function cartChange(name, price, delta) {
+    window.cartChange = function(name, price, delta) {
       if (!_cart[name]) _cart[name] = { name, price, qty: 0 };
       _cart[name].qty = Math.max(0, _cart[name].qty + delta);
       if (_cart[name].qty === 0) delete _cart[name];
-      syncCartQty();
-      _renderCartPanel();
-    }
+      _updateCart();
+    };
 
-    window.syncCartQty = function () {
+    window.syncCartQty = function() {
       document.querySelectorAll('[data-item-qty]').forEach(el => {
-        const qty = (_cart[el.dataset.itemQty] || {}).qty || 0;
-        el.textContent = qty;
+        el.textContent = (_cart[el.dataset.itemQty] || {qty:0}).qty;
       });
     };
 
-    function _renderCartPanel() {
+    function _updateCart() {
+      window.syncCartQty();
       const items = Object.values(_cart);
       const count = items.reduce((s, i) => s + i.qty, 0);
       const total = items.reduce((s, i) => s + i.price * i.qty, 0);
 
-      const btn = document.getElementById('_cartBtn');
+      /* floating cart button */
+      const cartBtn = document.getElementById('_cartBtn');
       document.getElementById('_cartBadge').textContent = count;
-      btn.style.display = count > 0 ? 'flex' : 'none';
+      cartBtn.style.display = count > 0 ? 'flex' : 'none';
+
+      /* floating تم button */
+      const doneBtn = document.getElementById('_doneBtn');
+      doneBtn.style.display = count > 0 ? 'flex' : 'none';
+
+      /* total in sheet */
       document.getElementById('_cartTotal').textContent = total.toLocaleString() + ' ل.ل';
 
+      /* cart items list */
       const itemsEl = document.getElementById('_cartItems');
       if (!items.length) {
         itemsEl.innerHTML = '<p style="text-align:center;color:var(--muted);padding:30px 0">السلة فارغة</p>';
@@ -1496,56 +1509,47 @@
         <div class="cart-row">
           <span class="cart-row-name">${i.name}</span>
           <div class="cart-row-ctrl">
-            <button class="cart-btn minus" data-action="cart" data-delta="-1" data-name="${i.name}" data-price="${i.price}">−</button>
+            <button class="cart-btn minus" onclick="window.cartChange('${i.name.replace(/'/g,"\\'")}',${i.price},-1)">−</button>
             <span>${i.qty}</span>
-            <button class="cart-btn plus" data-action="cart" data-delta="1" data-name="${i.name}" data-price="${i.price}">+</button>
+            <button class="cart-btn plus" onclick="window.cartChange('${i.name.replace(/'/g,"\\'")}',${i.price},1)">+</button>
           </div>
           <span class="cart-row-price">${(i.price * i.qty).toLocaleString()} ل.ل</span>
         </div>`).join('');
     }
 
-    function toggleCart() {
+    window.toggleCart = function() {
       const sheet = document.getElementById('_cartSheet');
       const overlay = document.getElementById('_cartOverlay');
       const open = sheet.classList.toggle('open');
       overlay.style.display = open ? 'block' : 'none';
-    }
+    };
 
-    function sendOrder() {
+    window.sendOrder = function() {
       const items = Object.values(_cart);
-      if (!items.length) { return; }
+      if (!items.length) return;
       const total = items.reduce((s, i) => s + i.price * i.qty, 0);
       let msg = '🍽️ *طلبي من مطعم فول وحمص:*\n\n';
       items.forEach(i => { msg += `• ${i.name} × ${i.qty} = ${(i.price * i.qty).toLocaleString()} ل.ل\n`; });
       msg += `\n💰 *المجموع: ${total.toLocaleString()} ل.ل*`;
-      const waNum = document.querySelector('a[href*="wa.me"]')?.href?.match(/wa\.me\/(\d+)/)?.[1] || '9613280613';
+      const waNum = document.querySelector('a.wa-float')?.href?.match(/wa\.me\/(\d+)/)?.[1] || '9613280613';
       window.open(`https://wa.me/${waNum}?text=${encodeURIComponent(msg)}`, '_blank');
-    }
+    };
 
-    /* Event delegation for cart buttons (works for dynamic cards too) */
-    document.addEventListener('click', e => {
-      const btn = e.target.closest('[data-action="cart"]');
-      if (!btn) return;
-      cartChange(btn.dataset.name, Number(btn.dataset.price), Number(btn.dataset.delta));
-    });
-
-    /* Inject cart buttons into static HTML cards (fallback when no Supabase data) */
-    document.addEventListener('DOMContentLoaded', () => {
-      document.querySelectorAll('.menu-card, .grill-card').forEach(card => {
-        if (card.querySelector('.cart-controls')) return;
-        const name = card.dataset.name;
-        const priceEl = card.querySelector('.card-price, .grill-card-price');
-        if (!name || !priceEl) return;
-        const price = parseInt(priceEl.textContent.replace(/[^0-9]/g, '')) || 0;
-        if (!price) return;
-        const div = document.createElement('div');
-        div.className = 'cart-controls';
-        div.innerHTML = `
-          <button class="cart-btn minus" data-action="cart" data-delta="-1" data-name="${name}" data-price="${price}">−</button>
-          <span class="cart-qty" data-item-qty="${name}">0</span>
-          <button class="cart-btn plus" data-action="cart" data-delta="1" data-name="${name}" data-price="${price}">+</button>`;
-        card.appendChild(div);
-      });
+    /* Inject cart buttons into static fallback cards */
+    document.querySelectorAll('.menu-card, .grill-card').forEach(card => {
+      if (card.querySelector('.cart-controls')) return;
+      const name = card.dataset.name;
+      const priceEl = card.querySelector('.card-price, .grill-card-price');
+      if (!name || !priceEl) return;
+      const price = parseInt(priceEl.textContent.replace(/[^0-9]/g, '')) || 0;
+      if (!price) return;
+      const div = document.createElement('div');
+      div.className = 'cart-controls';
+      div.innerHTML = `
+        <button class="cart-btn minus" onclick="window.cartChange('${name.replace(/'/g,"\\'")}',${price},-1)">−</button>
+        <span class="cart-qty" data-item-qty="${name}">0</span>
+        <button class="cart-btn plus" onclick="window.cartChange('${name.replace(/'/g,"\\'")}',${price},1)">+</button>`;
+      card.appendChild(div);
     });
   </script>
 
@@ -1595,6 +1599,7 @@
     .cart-row-ctrl span { font-size:14px; font-weight:900; color:#fff; min-width:18px; text-align:center; }
     #_cartSendBtn { width:100%; padding:15px; background:var(--red); color:#fff; border:none; border-radius:14px; font-size:16px; font-weight:900; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; margin-top:14px; }
     #_cartSendBtn:hover { opacity:.9; }
+    #_doneBtn { display:none; position:fixed; bottom:26px; right:26px; z-index:998; background:#25d366; color:#fff; border:none; border-radius:30px; padding:13px 22px; cursor:pointer; font-size:15px; font-weight:900; box-shadow:0 6px 24px rgba(37,211,102,.5); align-items:center; gap:8px; white-space:nowrap; }
   </style>
 
   <script>

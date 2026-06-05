@@ -116,9 +116,9 @@
           <div class="card-price">${Number(item.price).toLocaleString()} ل.ل</div>
         </div>
         <div class="cart-controls">
-          <button class="cart-btn minus" data-action="cart" data-delta="-1" data-name="${escapeHTML(item.name)}" data-price="${Number(item.price)}">−</button>
+          <button class="cart-btn minus" onclick="window.cartChange(this.dataset.name,+this.dataset.price,-1)" data-name="${escapeHTML(item.name)}" data-price="${Number(item.price)}">−</button>
           <span class="cart-qty" data-item-qty="${escapeHTML(item.name)}">0</span>
-          <button class="cart-btn plus" data-action="cart" data-delta="1" data-name="${escapeHTML(item.name)}" data-price="${Number(item.price)}">+</button>
+          <button class="cart-btn plus" onclick="window.cartChange(this.dataset.name,+this.dataset.price,1)" data-name="${escapeHTML(item.name)}" data-price="${Number(item.price)}">+</button>
         </div>
       </div>`).join('');
     attachReveal(grid.querySelectorAll('.reveal'));
@@ -166,9 +166,9 @@
           <div class="grill-card-price">${Number(g.price).toLocaleString()} ل.ل</div>
         </div>
         <div class="cart-controls">
-          <button class="cart-btn minus" data-action="cart" data-delta="-1" data-name="${escapeHTML(g.name)}" data-price="${Number(g.price)}">−</button>
+          <button class="cart-btn minus" onclick="window.cartChange(this.dataset.name,+this.dataset.price,-1)" data-name="${escapeHTML(g.name)}" data-price="${Number(g.price)}">−</button>
           <span class="cart-qty" data-item-qty="${escapeHTML(g.name)}">0</span>
-          <button class="cart-btn plus" data-action="cart" data-delta="1" data-name="${escapeHTML(g.name)}" data-price="${Number(g.price)}">+</button>
+          <button class="cart-btn plus" onclick="window.cartChange(this.dataset.name,+this.dataset.price,1)" data-name="${escapeHTML(g.name)}" data-price="${Number(g.price)}">+</button>
         </div>
       </div>`).join('');
     attachReveal(grid.querySelectorAll('.reveal'));
@@ -203,9 +203,9 @@
           ${offer.price ? `<span class="offer-card-price">${Number(offer.price).toLocaleString()} ل.ل</span>` : ''}
         </div>
         ${offer.price ? `<div class="cart-controls">
-          <button class="cart-btn minus" data-action="cart" data-delta="-1" data-name="${escapeHTML(offer.name)}" data-price="${Number(offer.price)}">−</button>
+          <button class="cart-btn minus" onclick="window.cartChange(this.dataset.name,+this.dataset.price,-1)" data-name="${escapeHTML(offer.name)}" data-price="${Number(offer.price)}">−</button>
           <span class="cart-qty" data-item-qty="${escapeHTML(offer.name)}">0</span>
-          <button class="cart-btn plus" data-action="cart" data-delta="1" data-name="${escapeHTML(offer.name)}" data-price="${Number(offer.price)}">+</button>
+          <button class="cart-btn plus" onclick="window.cartChange(this.dataset.name,+this.dataset.price,1)" data-name="${escapeHTML(offer.name)}" data-price="${Number(offer.price)}">+</button>
         </div>` : ''}
       </div>`).join('');
     attachReveal(grid.querySelectorAll('.reveal'));
