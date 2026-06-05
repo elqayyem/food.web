@@ -262,7 +262,12 @@
       let extrasHTML = '';
       if (cat.extras && cat.extras.length) {
         extrasHTML = `<div class="drinks-extras">${cat.extras.map(e =>
-          `<span class="drinks-extra-item">${escapeHTML(e.name)}: <span class="drinks-extra-price">${Number(e.price).toLocaleString()} ل.ل</span></span>`
+          e.image
+            ? `<div class="drinks-extra-item" style="display:flex;align-items:center;gap:8px;flex-direction:column;text-align:center">
+                <img src="${sanitizeURL(e.image)}" alt="${escapeHTML(e.name)}" style="width:80px;height:80px;object-fit:cover;border-radius:10px;border:2px solid rgba(232,160,32,.3)" onerror="this.style.display='none'"/>
+                <span>${escapeHTML(e.name)}: <span class="drinks-extra-price">${Number(e.price).toLocaleString()} ل.ل</span></span>
+               </div>`
+            : `<span class="drinks-extra-item">${escapeHTML(e.name)}: <span class="drinks-extra-price">${Number(e.price).toLocaleString()} ل.ل</span></span>`
         ).join('<span style="color:var(--muted)"> | </span>')}</div>`;
       }
 

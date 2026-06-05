@@ -1838,6 +1838,7 @@ function renderDrinksAdmin() {
           <div style="font-size:13px;font-weight:700;color:var(--gold);margin-bottom:10px">الإضافات</div>
           ${(cat.extras||[]).map((e,idx)=>`
             <div style="display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid var(--border)">
+              ${e.image ? `<img src="${sanitizeURL(e.image)}" style="width:40px;height:40px;object-fit:cover;border-radius:8px;flex-shrink:0" onerror="this.style.display='none'"/>` : ''}
               <span style="flex:1;font-size:13px">${escapeHTML(e.name)}</span>
               <span style="color:var(--gold);font-weight:700">${Number(e.price).toLocaleString()} ل.ل</span>
               <button class="btn btn-sm btn-info" onclick="openDrinkExtraModal(${cat.id},${idx})"><i class="fas fa-pen"></i></button>
@@ -1915,11 +1916,14 @@ function openDrinkExtraModal(catId, idx) {
   document.getElementById('modalTitle').textContent = extra ? 'تعديل إضافة' : 'إضافة جديدة';
   document.getElementById('modalBody').innerHTML = `
     <div class="form-group"><label>الاسم *</label><input class="form-control" id="de_name" value="${extra?escapeHTML(extra.name):''}"/></div>
-    <div class="form-group"><label>السعر (ل.ل) *</label><input class="form-control" id="de_price" type="number" value="${extra?extra.price:''}"/></div>`;
+    <div class="form-group"><label>السعر (ل.ل) *</label><input class="form-control" id="de_price" type="number" value="${extra?extra.price:''}"/></div>
+    <div class="form-group">${imgFieldHTML('de_img','de_preview','الصورة (اختياري)')}</div>`;
   document.getElementById('modalFooter').innerHTML = `
     <button class="btn btn-primary" onclick="saveDrinkExtra(${catId},${idx!==null&&idx!==undefined?idx:-1})"><i class="fas fa-save"></i> حفظ</button>
     <button class="btn btn-secondary" onclick="closeModal()">إلغاء</button>`;
   openModal();
+  attachImgUpload('de_img','de_preview');
+  if (extra && extra.image) { document.getElementById('de_img').value = extra.image; previewImg('de_img','de_preview'); }
 }
 
 function saveDrinkExtra(catId, idx) {
@@ -1929,9 +1933,10 @@ function saveDrinkExtra(catId, idx) {
   const name = sanitizeInput(document.getElementById('de_name').value, 100);
   const price = parseInt(document.getElementById('de_price').value)||0;
   if (!name || !price) { toast('أدخل الاسم والسعر','error'); return; }
+  const img = sanitizeURL(document.getElementById('de_img').value.trim());
   if (!cat.extras) cat.extras = [];
-  if (idx >= 0) { cat.extras[idx] = {name, price}; }
-  else { cat.extras.push({name, price}); }
+  if (idx >= 0) { cat.extras[idx] = {name, price, image:img}; }
+  else { cat.extras.push({name, price, image:img}); }
   persist(); closeModal(); renderDrinksAdmin(); toast('تم الحفظ','success');
 }
 
