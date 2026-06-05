@@ -97,6 +97,16 @@
     });
   }
 
+  /* ── Cart controls helper ── */
+  function cartCtrl(name, price) {
+    const n = escapeHTML(name), p = Number(price);
+    return `<div class="cart-controls-inline">
+      <button class="cart-btn minus" onclick="window.cartChange(this.dataset.n,+this.dataset.p,-1)" data-n="${n}" data-p="${p}">−</button>
+      <span class="cart-qty" data-item-qty="${n}">0</span>
+      <button class="cart-btn plus" onclick="window.cartChange(this.dataset.n,+this.dataset.p,1)" data-n="${n}" data-p="${p}">+</button>
+    </div>`;
+  }
+
   /* ── Render menu grid ── */
   function renderMenuGrid(items) {
     const grid = document.getElementById('menuGrid');
@@ -139,6 +149,7 @@
             ${meal.items.map(item => `
               <div class="meal-row">
                 <span class="meal-row-name">${escapeHTML(item.name)}</span>
+                ${cartCtrl(item.name, item.price)}
                 <span class="meal-row-price">${Number(item.price).toLocaleString()}</span>
               </div>`).join('')}
           </div>
@@ -226,12 +237,14 @@
             ${(item.sizes||[]).map(s => `
               <div class="fatoor-size-row">
                 <span class="fatoor-size-label">${escapeHTML(s.label)}</span>
+                ${cartCtrl(item.name + ' - ' + s.label, s.price)}
                 <span class="fatoor-size-price">${Number(s.price).toLocaleString()} ل.ل</span>
               </div>`).join('')}
           </div>
         </div>
       </div>`).join('');
     attachReveal(grid.querySelectorAll('.reveal'));
+    window.syncCartQty?.();
   }
 
   /* ── Render fatoor section ── */
@@ -248,12 +261,14 @@
             ${(item.sizes||[]).map(s => `
               <div class="fatoor-size-row">
                 <span class="fatoor-size-label">${escapeHTML(s.label)}</span>
+                ${cartCtrl(item.name + ' - ' + s.label, s.price)}
                 <span class="fatoor-size-price">${Number(s.price).toLocaleString()} ل.ل</span>
               </div>`).join('')}
           </div>
         </div>
       </div>`).join('');
     attachReveal(grid.querySelectorAll('.reveal'));
+    window.syncCartQty?.();
   }
 
   /* ── Render drinks section ── */
@@ -265,6 +280,7 @@
         const sizeRows = (cat.sizes||[]).map((s,i) => `
           <div class="drink-size-row">
             <span class="drink-size-label">${escapeHTML(s)}</span>
+            ${cartCtrl(item.name + ' - ' + s, (item.prices||[])[i]||0)}
             <span class="drink-size-price">${Number((item.prices||[])[i]||0).toLocaleString()} ل.ل</span>
           </div>`).join('');
         const img = item.image ? `<img src="${sanitizeURL(item.image)}" alt="${escapeHTML(item.name)}" loading="lazy" onerror="this.src='https://placehold.co/300x200?text=Image'"/>` : `<img src="https://placehold.co/300x200?text=Image" alt="${escapeHTML(item.name)}"/>`;
@@ -284,8 +300,9 @@
             ? `<div class="drinks-extra-item" style="display:flex;align-items:center;gap:8px;flex-direction:column;text-align:center">
                 <img src="${sanitizeURL(e.image)}" alt="${escapeHTML(e.name)}" style="width:80px;height:80px;object-fit:cover;border-radius:10px;border:2px solid rgba(232,160,32,.3)" onerror="this.style.display='none'"/>
                 <span>${escapeHTML(e.name)}: <span class="drinks-extra-price">${Number(e.price).toLocaleString()} ل.ل</span></span>
+                ${cartCtrl(e.name, e.price)}
                </div>`
-            : `<span class="drinks-extra-item">${escapeHTML(e.name)}: <span class="drinks-extra-price">${Number(e.price).toLocaleString()} ل.ل</span></span>`
+            : `<span class="drinks-extra-item" style="display:inline-flex;align-items:center;gap:6px">${escapeHTML(e.name)}: <span class="drinks-extra-price">${Number(e.price).toLocaleString()} ل.ل</span>${cartCtrl(e.name, e.price)}</span>`
         ).join('<span style="color:var(--muted)"> | </span>')}</div>`;
       }
 
@@ -296,6 +313,7 @@
           const sizeRows = kiloSizes.map((s,i) => `
             <div class="drink-size-row">
               <span class="drink-size-label">${escapeHTML(s)}</span>
+              ${cartCtrl(item.name + ' - ' + s, (item.prices||[])[i]||0)}
               <span class="drink-size-price">${Number((item.prices||[])[i]||0).toLocaleString()} ل.ل</span>
             </div>`).join('');
           const img = item.image ? `<img src="${sanitizeURL(item.image)}" alt="${escapeHTML(item.name)}" loading="lazy" onerror="this.src='https://placehold.co/300x200?text=Image'"/>` : `<img src="https://placehold.co/300x200?text=Image" alt="${escapeHTML(item.name)}"/>`;
@@ -314,6 +332,7 @@
       </div>`;
     }).join('');
     attachReveal(grid.querySelectorAll('.reveal'));
+    window.syncCartQty?.();
   }
 
   /* ── Re-wire category filter & search after menu re-render ── */
