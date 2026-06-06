@@ -689,6 +689,21 @@
     </div>
   </section>
 
+  <!-- ══════════ QUICK NAV ══════════ -->
+  <section style="background:var(--dark2);padding:22px 0;border-bottom:1px solid var(--dark4)">
+    <div class="container">
+      <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center">
+        <a href="#menu"    class="qnav-btn">🥙 المنيو</a>
+        <a href="#grills"  class="qnav-btn">🔥 مشاوي</a>
+        <a href="#meals"   class="qnav-btn">🍽️ وجبات</a>
+        <a href="#offers"  class="qnav-btn">🎁 العروضات</a>
+        <a href="#mansaf"  class="qnav-btn">🫕 المناسف</a>
+        <a href="#fatoor"  class="qnav-btn">☕ الفطور</a>
+        <a href="#drinks"  class="qnav-btn">🥤 مشروبات</a>
+      </div>
+    </div>
+  </section>
+
   <!-- ══════════ MENU SECTION ══════════ -->
   <section class="menu-section" id="menu">
     <div class="container">
@@ -1602,6 +1617,10 @@
     .cart-row-ctrl span { font-size:14px; font-weight:900; color:#fff; min-width:18px; text-align:center; }
     #_cartSendBtn { width:100%; padding:15px; background:var(--red); color:#fff; border:none; border-radius:14px; font-size:16px; font-weight:900; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; margin-top:14px; }
     #_cartSendBtn:hover { opacity:.9; }
+    .qnav-btn { display:inline-flex; align-items:center; gap:6px; padding:10px 18px; background:var(--dark3); color:#fff; border-radius:30px; text-decoration:none; font-size:14px; font-weight:700; border:1px solid var(--dark4); transition:.2s; white-space:nowrap; }
+    .qnav-btn:hover { background:var(--red); border-color:var(--red); color:#fff; transform:translateY(-2px); }
+    @media(max-width:600px){ .qnav-btn { font-size:13px; padding:8px 14px; } }
+
     #_doneBtn { display:none; position:fixed; bottom:26px; right:26px; z-index:998; background:#25d366; color:#fff; border:none; border-radius:30px; padding:13px 22px; cursor:pointer; font-size:15px; font-weight:900; box-shadow:0 6px 24px rgba(37,211,102,.5); align-items:center; gap:8px; white-space:nowrap; }
   </style>
 
