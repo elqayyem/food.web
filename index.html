@@ -11,12 +11,12 @@
 
   <!-- SECURITY: Content Security Policy — restrict where resources can load from -->
   <meta http-equiv="Content-Security-Policy" content="
-    default-src 'self' https:;
+    default-src 'self';
     script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com;
     style-src  'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;
     font-src   'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;
-    img-src    'self' https: data:;
-    connect-src 'self' https://hnyzgeucabtpppyxnsel.supabase.co;
+    img-src    'self' data:;
+    connect-src 'self';
   " />
   <!-- NOTE: frame-ancestors cannot be set via meta tag — HTTP header only.
        GitHub Pages does not support custom headers, so clickjacking protection
@@ -674,15 +674,15 @@
 
       <div class="hero-images">
         <img id="heroImg1"
-          src="https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=800&q=80"
+          src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E"
           alt="شاورما"
         />
         <img id="heroImg2"
-          src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500&q=80"
+          src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E"
           alt="برغر"
         />
         <img id="heroImg3"
-          src="https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=500&q=80"
+          src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E"
           alt="بطاطا"
         />
       </div>
@@ -738,7 +738,7 @@
 
         <!-- Sandwiches / individual items -->
         <div class="menu-card reveal" data-category="sandwiches" data-name="بطاطا">
-          <img src="https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=400&q=80" alt="بطاطا" loading="lazy" />
+          <img src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E" alt="بطاطا" loading="lazy" />
           <div class="card-body">
             <div class="card-name">بطاطا</div>
             <div class="card-price">200 ل.ل</div>
@@ -747,7 +747,7 @@
 
         <div class="menu-card reveal" data-category="sandwiches" data-name="لفة كريسبى">
           <span class="pop-badge">⭐ الأكثر طلباً</span>
-          <img src="https://images.unsplash.com/photo-1562967914-608f82629710?w=400&q=80" alt="لفة كريسبى" loading="lazy" />
+          <img src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E" alt="لفة كريسبى" loading="lazy" />
           <div class="card-body">
             <div class="card-name">لفة كريسبى</div>
             <div class="card-price">400 ل.ل</div>
@@ -755,7 +755,7 @@
         </div>
 
         <div class="menu-card reveal" data-category="sandwiches" data-name="لفة طاووق">
-          <img src="https://images.unsplash.com/photo-1601400745779-3b2b36a01d60?w=400&q=80" alt="لفة طاووق" loading="lazy" />
+          <img src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E" alt="لفة طاووق" loading="lazy" />
           <div class="card-body">
             <div class="card-name">لفة طاووق</div>
             <div class="card-price">400 ل.ل</div>
@@ -763,7 +763,7 @@
         </div>
 
         <div class="menu-card reveal" data-category="sandwiches" data-name="لفة سجق">
-          <img src="https://images.unsplash.com/photo-1619096252214-ef06c45683e3?w=400&q=80" alt="لفة سجق" loading="lazy" />
+          <img src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E" alt="لفة سجق" loading="lazy" />
           <div class="card-body">
             <div class="card-name">لفة سجق</div>
             <div class="card-price">400 ل.ل</div>
@@ -772,7 +772,7 @@
 
         <div class="menu-card reveal" data-category="sandwiches" data-name="سمون برغر">
           <span class="pop-badge">⭐ الأكثر طلباً</span>
-          <img src="https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&q=80" alt="سمون برغر" loading="lazy" />
+          <img src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E" alt="سمون برغر" loading="lazy" />
           <div class="card-body">
             <div class="card-name">سمون برغر</div>
             <div class="card-price">400 ل.ل</div>
@@ -780,7 +780,7 @@
         </div>
 
         <div class="menu-card reveal" data-category="sandwiches" data-name="تشيكن برغر">
-          <img src="https://images.unsplash.com/photo-1606755962773-d324e0a13086?w=400&q=80" alt="تشيكن برغر" loading="lazy" />
+          <img src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E" alt="تشيكن برغر" loading="lazy" />
           <div class="card-body">
             <div class="card-name">تشيكن برغر</div>
             <div class="card-price">350 ل.ل</div>
@@ -788,7 +788,7 @@
         </div>
 
         <div class="menu-card reveal" data-category="sandwiches" data-name="سمون زنجر">
-          <img src="https://images.unsplash.com/photo-1610614991668-68795bb32088?w=400&q=80" alt="سمون زنجر" loading="lazy" />
+          <img src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E" alt="سمون زنجر" loading="lazy" />
           <div class="card-body">
             <div class="card-name">سمون زنجر</div>
             <div class="card-price">450 ل.ل</div>
@@ -796,7 +796,7 @@
         </div>
 
         <div class="menu-card reveal" data-category="sandwiches" data-name="سمون اسكالوب">
-          <img src="https://images.unsplash.com/photo-1585325701956-60dd9c8553bc?w=400&q=80" alt="سمون اسكالوب" loading="lazy" />
+          <img src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E" alt="سمون اسكالوب" loading="lazy" />
           <div class="card-body">
             <div class="card-name">سمون اسكالوب</div>
             <div class="card-price">450 ل.ل</div>
@@ -804,7 +804,7 @@
         </div>
 
         <div class="menu-card reveal" data-category="sandwiches" data-name="فاهيتا">
-          <img src="https://images.unsplash.com/photo-1534938665420-4193effeacc4?w=400&q=80" alt="فاهيتا" loading="lazy" />
+          <img src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E" alt="فاهيتا" loading="lazy" />
           <div class="card-body">
             <div class="card-name">فاهيتا</div>
             <div class="card-price">650 ل.ل</div>
@@ -814,7 +814,7 @@
         <!-- Shawarma -->
         <div class="menu-card reveal" data-category="shawarma" data-name="شاورما كبير">
           <span class="pop-badge">⭐ الأكثر طلباً</span>
-          <img src="https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=400&q=80" alt="شاورما كبير" loading="lazy" />
+          <img src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E" alt="شاورما كبير" loading="lazy" />
           <div class="card-body">
             <div class="card-name">شاورما كبير</div>
             <div class="card-price">400 ل.ل</div>
@@ -822,7 +822,7 @@
         </div>
 
         <div class="menu-card reveal" data-category="shawarma" data-name="شاورما صغير">
-          <img src="https://images.unsplash.com/photo-1613987548851-d9b7967f3d66?w=400&q=80" alt="شاورما صغير" loading="lazy" />
+          <img src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E" alt="شاورما صغير" loading="lazy" />
           <div class="card-body">
             <div class="card-name">شاورما صغير</div>
             <div class="card-price">200 ل.ل</div>
@@ -830,7 +830,7 @@
         </div>
 
         <div class="menu-card reveal" data-category="shawarma" data-name="شاورما تركي">
-          <img src="https://images.unsplash.com/photo-1625058547878-5ce47a71f960?w=400&q=80" alt="شاورما تركي" loading="lazy" />
+          <img src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E" alt="شاورما تركي" loading="lazy" />
           <div class="card-body">
             <div class="card-name">شاورما تركي</div>
             <div class="card-price">650 ل.ل</div>
@@ -839,7 +839,7 @@
 
         <!-- Grills preview cards -->
         <div class="menu-card reveal" data-category="grills" data-name="كفتة جاج">
-          <img src="https://images.unsplash.com/photo-1544025162-d76538ab0a65?w=400&q=80" alt="كفتة جاج" loading="lazy" />
+          <img src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E" alt="كفتة جاج" loading="lazy" />
           <div class="card-body">
             <div class="card-name">كفتة جاج</div>
             <div class="card-price">800 ل.ل</div>
@@ -848,7 +848,7 @@
 
         <div class="menu-card reveal" data-category="grills" data-name="مشاوي مشكل">
           <span class="pop-badge">⭐ الأكثر طلباً</span>
-          <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&q=80" alt="مشاوي مشكل" loading="lazy" />
+          <img src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E" alt="مشاوي مشكل" loading="lazy" />
           <div class="card-body">
             <div class="card-name">مشاوي مشكل</div>
             <div class="card-price">1800 ل.ل</div>
@@ -856,7 +856,7 @@
         </div>
 
         <div class="menu-card reveal" data-category="grills" data-name="كفتة لحمة">
-          <img src="https://images.unsplash.com/photo-1528207776546-365bb710ee93?w=400&q=80" alt="كفتة لحمة" loading="lazy" />
+          <img src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E" alt="كفتة لحمة" loading="lazy" />
           <div class="card-body">
             <div class="card-name">كفتة لحمة</div>
             <div class="card-price">1900 ل.ل</div>
@@ -864,7 +864,7 @@
         </div>
 
         <div class="menu-card reveal" data-category="grills" data-name="شقف">
-          <img src="https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=400&q=80" alt="شقف" loading="lazy" />
+          <img src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E" alt="شقف" loading="lazy" />
           <div class="card-body">
             <div class="card-name">شقف</div>
             <div class="card-price">2400 ل.ل</div>
@@ -872,7 +872,7 @@
         </div>
 
         <div class="menu-card reveal" data-category="grills" data-name="طاووق مشوي">
-          <img src="https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=400&q=80" alt="طاووق مشوي" loading="lazy" />
+          <img src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E" alt="طاووق مشوي" loading="lazy" />
           <div class="card-body">
             <div class="card-name">طاووق مشوي</div>
             <div class="card-price">1300 ل.ل</div>
@@ -881,7 +881,7 @@
 
         <!-- Chicken -->
         <div class="menu-card reveal" data-category="chicken" data-name="فروج غاز">
-          <img src="https://images.unsplash.com/photo-1598103442097-8b74394b95c3?w=400&q=80" alt="فروج غاز" loading="lazy" />
+          <img src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E" alt="فروج غاز" loading="lazy" />
           <div class="card-body">
             <div class="card-name">فروج غاز</div>
             <div class="card-price">800 ل.ل</div>
@@ -889,7 +889,7 @@
         </div>
 
         <div class="menu-card reveal" data-category="chicken" data-name="فروج فحم">
-          <img src="https://images.unsplash.com/photo-1598103442097-8b74394b95c3?w=400&q=80" alt="فروج فحم" loading="lazy" />
+          <img src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E" alt="فروج فحم" loading="lazy" />
           <div class="card-body">
             <div class="card-name">فروج فحم</div>
             <div class="card-price">800 ل.ل</div>
@@ -898,7 +898,7 @@
 
         <!-- Meals (crispy) -->
         <div class="menu-card reveal" data-category="meals" data-name="وجبة كريسبي كبيرة">
-          <img src="https://images.unsplash.com/photo-1562967914-608f82629710?w=400&q=80" alt="كريسبي كبيرة" loading="lazy" />
+          <img src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E" alt="كريسبي كبيرة" loading="lazy" />
           <div class="card-body">
             <div class="card-name">كريسبي كبيرة (10 قطع)</div>
             <div class="card-price">1250 ل.ل</div>
@@ -906,7 +906,7 @@
         </div>
 
         <div class="menu-card reveal" data-category="meals" data-name="وجبة بروستد">
-          <img src="https://images.unsplash.com/photo-1598103442097-8b74394b95c3?w=400&q=80" alt="بروستد" loading="lazy" />
+          <img src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E" alt="بروستد" loading="lazy" />
           <div class="card-body">
             <div class="card-name">وجبة بروستد نص فروج</div>
             <div class="card-price">700 ل.ل</div>
@@ -960,7 +960,7 @@
               </div>
             </div>
             <img
-              src="https://images.unsplash.com/photo-1598103442097-8b74394b95c3?w=200&q=80"
+              src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E"
               alt="فراريج"
               class="meal-cat-img"
             />
@@ -982,7 +982,7 @@
               </div>
             </div>
             <img
-              src="https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=200&q=80"
+              src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E"
               alt="شاورما"
               class="meal-cat-img"
             />
@@ -1004,7 +1004,7 @@
               </div>
             </div>
             <img
-              src="https://images.unsplash.com/photo-1598103442097-8b74394b95c3?w=200&q=80"
+              src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E"
               alt="بروستد"
               class="meal-cat-img"
             />
@@ -1030,7 +1030,7 @@
               </div>
             </div>
             <img
-              src="https://images.unsplash.com/photo-1562967914-608f82629710?w=200&q=80"
+              src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E"
               alt="كريسبي"
               class="meal-cat-img"
             />
@@ -1051,7 +1051,7 @@
       <div class="grills-grid" id="grillsGrid">
 
         <div class="grill-card reveal">
-          <img src="https://images.unsplash.com/photo-1544025162-d76538ab0a65?w=400&q=80" alt="كفتة جاج" loading="lazy" />
+          <img src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E" alt="كفتة جاج" loading="lazy" />
           <div class="grill-card-body">
             <div class="grill-card-name">كفتة جاج</div>
             <div class="grill-card-price">800 ل.ل</div>
@@ -1059,7 +1059,7 @@
         </div>
 
         <div class="grill-card reveal">
-          <img src="https://images.unsplash.com/photo-1528207776546-365bb710ee93?w=400&q=80" alt="كفتة لحمة" loading="lazy" />
+          <img src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E" alt="كفتة لحمة" loading="lazy" />
           <div class="grill-card-body">
             <div class="grill-card-name">كفتة لحمة</div>
             <div class="grill-card-price">1900 ل.ل</div>
@@ -1068,7 +1068,7 @@
 
         <div class="grill-card reveal">
           <span class="pop-badge">⭐ الأكثر طلباً</span>
-          <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&q=80" alt="مشاوي مشكل" loading="lazy" />
+          <img src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E" alt="مشاوي مشكل" loading="lazy" />
           <div class="grill-card-body">
             <div class="grill-card-name">مشاوي مشكل</div>
             <div class="grill-card-price">1800 ل.ل</div>
@@ -1076,7 +1076,7 @@
         </div>
 
         <div class="grill-card reveal">
-          <img src="https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?w=400&q=80" alt="شقف" loading="lazy" />
+          <img src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E" alt="شقف" loading="lazy" />
           <div class="grill-card-body">
             <div class="grill-card-name">شقف</div>
             <div class="grill-card-price">2400 ل.ل</div>
@@ -1084,7 +1084,7 @@
         </div>
 
         <div class="grill-card reveal">
-          <img src="https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=400&q=80" alt="طاووق" loading="lazy" />
+          <img src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E" alt="طاووق" loading="lazy" />
           <div class="grill-card-body">
             <div class="grill-card-name">طاووق</div>
             <div class="grill-card-price">1300 ل.ل</div>
@@ -1128,7 +1128,7 @@
 
         <!-- ماليزية -->
         <div class="fatoor-card reveal">
-          <img src="https://images.unsplash.com/photo-1547592180-85f173990554?w=500&q=80" alt="ماليزية" loading="lazy" onerror="this.src='https://placehold.co/500x200?text=ماليزية'"/>
+          <img src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E" alt="ماليزية" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E'"/>
           <div class="fatoor-card-body">
             <div class="fatoor-card-name">🟡 ماليزية</div>
             <div class="fatoor-sizes">
@@ -1150,7 +1150,7 @@
 
         <!-- فتة حمص -->
         <div class="fatoor-card reveal">
-          <img src="https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=500&q=80" alt="فتة حمص" loading="lazy" onerror="this.src='https://placehold.co/500x200?text=فتة حمص'"/>
+          <img src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E" alt="فتة حمص" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E حمص'"/>
           <div class="fatoor-card-body">
             <div class="fatoor-card-name">🟤 فتة حمص</div>
             <div class="fatoor-sizes">
@@ -1172,7 +1172,7 @@
 
         <!-- حمص مسبحة -->
         <div class="fatoor-card reveal">
-          <img src="https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?w=500&q=80" alt="حمص مسبحة" loading="lazy" onerror="this.src='https://placehold.co/500x200?text=حمص مسبحة'"/>
+          <img src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E" alt="حمص مسبحة" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E مسبحة'"/>
           <div class="fatoor-card-body">
             <div class="fatoor-card-name">🟢 حمص مسبحة</div>
             <div class="fatoor-sizes">
@@ -1194,7 +1194,7 @@
 
         <!-- فول -->
         <div class="fatoor-card reveal">
-          <img src="https://images.unsplash.com/photo-1512058454905-6b841e7ad132?w=500&q=80" alt="فول" loading="lazy" onerror="this.src='https://placehold.co/500x200?text=فول'"/>
+          <img src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E" alt="فول" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E'"/>
           <div class="fatoor-card-body">
             <div class="fatoor-card-name">🟠 فول</div>
             <div class="fatoor-sizes">
@@ -1216,7 +1216,7 @@
 
         <!-- حمص ناعم -->
         <div class="fatoor-card reveal">
-          <img src="https://images.unsplash.com/photo-1593001872095-7d5b3868fb1f?w=500&q=80" alt="حمص ناعم" loading="lazy" onerror="this.src='https://placehold.co/500x200?text=حمص ناعم'"/>
+          <img src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E" alt="حمص ناعم" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E ناعم'"/>
           <div class="fatoor-card-body">
             <div class="fatoor-card-name">🟣 حمص ناعم</div>
             <div class="fatoor-sizes">
@@ -1238,7 +1238,7 @@
 
         <!-- حمص ناعم بلحمة -->
         <div class="fatoor-card reveal">
-          <img src="https://images.unsplash.com/photo-1529059997568-3d847b1154f0?w=500&q=80" alt="حمص ناعم بلحمة" loading="lazy" onerror="this.src='https://placehold.co/500x200?text=حمص بلحمة'"/>
+          <img src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E" alt="حمص ناعم بلحمة" loading="lazy" onerror="this.src='data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E بلحمة'"/>
           <div class="fatoor-card-body">
             <div class="fatoor-card-name">🔴 حمص ناعم بلحمة</div>
             <div class="fatoor-sizes">
@@ -1279,7 +1279,7 @@
       <div class="about-inner">
         <div class="about-img reveal">
           <img id="aboutImg"
-            src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=800&q=80"
+            src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3C/svg%3E"
             alt="عن المطعم"
           />
         </div>
@@ -1471,7 +1471,9 @@
     });
   </script>
 
-  <!-- Site loader: applies admin changes from localStorage -->
+  <!-- Site data: baked-in static data (replaces Supabase). Loaded before the loader. -->
+  <script src="data.js"></script>
+  <!-- Site loader: applies data from data.js to the page -->
   <script src="js/site-loader.js"></script>
 
   <script>

@@ -1,0 +1,7 @@
+# Raw Supabase exports + build artifacts — DO NOT COMMIT
+# (export/site_data_raw.json still contains the old plaintext admin credentials)
+export/
+
+# OS / editor junk
+Thumbs.db
+.DS_Store

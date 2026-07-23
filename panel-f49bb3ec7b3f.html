@@ -10,12 +10,12 @@
 
 <!-- SECURITY: CSP — only allow resources from trusted sources -->
 <meta http-equiv="Content-Security-Policy" content="
-  default-src 'self' https:;
-  script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;
+  default-src 'self';
+  script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com;
   style-src  'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;
   font-src   'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;
-  img-src    'self' https: data: blob:;
-  connect-src 'self' https://hnyzgeucabtpppyxnsel.supabase.co;
+  img-src    'self' data: blob:;
+  connect-src 'self';
 "/>
 <!-- NOTE: frame-ancestors must be an HTTP header — removed from meta tag to fix browser warning -->
 
@@ -418,28 +418,6 @@ tr.dragging{opacity:.4}
 </head>
 <body>
 
-<!-- ══════════ LOGIN PAGE ══════════ -->
-<div id="loginPage">
-  <div class="login-box">
-    <div class="login-logo">🍽️</div>
-    <h1>لوحة التحكم</h1>
-    <p>مطعم وسناك فول وحمص</p>
-    <div class="login-error" id="loginError"><i class="fas fa-exclamation-circle"></i> <span id="loginErrMsg">بريد أو كلمة مرور غلط</span></div>
-    <!-- SECURITY: Email field — uses Supabase Auth (server-side hashed passwords) -->
-    <div class="form-group">
-      <label>البريد الإلكتروني</label>
-      <input type="email" id="loginUser" placeholder="admin@example.com" autocomplete="email" maxlength="255"/>
-    </div>
-    <div class="form-group">
-      <label>كلمة المرور</label>
-      <input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password" maxlength="128"/>
-    </div>
-    <!-- SECURITY: Brute-force lockout notice -->
-    <div id="lockoutNotice" style="display:none;background:#fff7ed;border:1px solid #fed7aa;color:#c2410c;padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:14px;text-align:center"></div>
-    <button class="btn-login" onclick="doLogin()"><i class="fas fa-sign-in-alt"></i> دخول</button>
-  </div>
-</div>
-
 <!-- ══════════ ADMIN PANEL ══════════ -->
 <div id="adminPanel">
   <div id="sidebarOverlay" onclick="closeSidebar()"></div>
@@ -482,7 +460,6 @@ tr.dragging{opacity:.4}
             <div class="name" id="adminName">Admin</div>
             <div class="role">مدير الموقع</div>
           </div>
-          <button class="btn-logout" onclick="doLogout()" title="تسجيل الخروج"><i class="fas fa-sign-out-alt"></i></button>
         </div>
       </div>
     </aside>
@@ -494,7 +471,10 @@ tr.dragging{opacity:.4}
           <button class="hamburger-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
           <span class="topbar-title" id="topbarTitle">لوحة التحكم</span>
         </div>
-        <div class="topbar-right">
+        <div class="topbar-right" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <span id="dirtyBadge" style="display:none;font-size:12px;font-weight:700;color:var(--yellow)"><i class="fas fa-circle" style="font-size:8px"></i> تغييرات غير منشورة</span>
+          <button class="btn btn-secondary btn-sm" onclick="discardChanges()" title="التراجع عن التغييرات غير المنشورة"><i class="fas fa-rotate-left"></i> تجاهل التغييرات</button>
+          <button class="btn btn-success btn-sm" onclick="publishData()" title="تنزيل ملف data.js للنشر"><i class="fas fa-cloud-arrow-up"></i> نشر (تنزيل data.js)</button>
           <a href="index.html" target="_blank" rel="noopener noreferrer" class="btn-site"><i class="fas fa-external-link-alt"></i> عرض الموقع</a>
         </div>
       </header>
@@ -692,15 +672,14 @@ tr.dragging{opacity:.4}
 <!-- TOAST CONTAINER -->
 <div id="toastContainer"></div>
 
-<!-- SECURITY: Supabase JS SDK — needed for real server-side Auth + RLS-aware API calls -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<!-- Baked-in site data (replaces Supabase). Loaded before the admin script. -->
+<script src="data.js"></script>
 <script>
 /* ════════════════════════════════════════════════
    DEFAULT DATA — full restaurant data model
 ════════════════════════════════════════════════ */
 const DEFAULTS = {
   version: '1.0',
-  credentials: { username: 'admin', password: 'admin123' },
   hero: {
     title1: 'مطعم وسناك', title2: 'فول وحمص',
     welcome: 'يرحب بكم',
@@ -843,15 +822,18 @@ function escapeHTML(str) {
     .replace(/'/g, '&#x27;');
 }
 
-/* Allow image URLs — blocks only truly dangerous protocols (javascript:, data:, vbscript:) */
+/* Self-contained placeholder (no external host — CSP-safe) */
+const PH = "data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='80'%20height='80'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%23e5e7eb'/%3E%3C/svg%3E";
+window.__PH = PH;
+
+/* Allow image sources: base64 data images, local paths, and http(s). Blocks javascript:/vbscript:. */
 function sanitizeURL(url) {
   let s = String(url || '').trim();
   if (!s) return '';
-  // Block dangerous protocols only
-  if (/^(javascript|data|vbscript):/i.test(s)) return '';
-  // Auto-add https:// if user forgot it
-  if (!/^https?:\/\//i.test(s)) s = 'https://' + s;
-  return s;
+  if (/^data:image\//i.test(s)) return s;         // base64 images from uploads
+  if (/^(javascript|vbscript|data):/i.test(s)) return ''; // dangerous (non-image data: too)
+  if (/^https?:\/\//i.test(s)) return s;           // absolute remote
+  return s;                                        // relative/local path e.g. images/...
 }
 
 /* Sanitize and trim a text input — strips tags, limits length */
@@ -862,37 +844,27 @@ const STATUS_LABELS = {new:'جديد',preparing:'قيد التحضير',ready:'�
 const STATUS_COLORS = {new:'blue',preparing:'yellow',ready:'green',delivered:'gray',cancelled:'badge-red'};
 
 /* ════════════════════════════════════════════════
-   SUPABASE CLIENT INIT
-   SECURITY: Uses Supabase JS SDK which automatically attaches
-   the authenticated user's JWT to every write request.
-   RLS policies on the server enforce who can read/write.
+   STATIC DATA STORE (replaces Supabase)
+   Data lives in data.js (window.SITE_DATA). The admin edits an
+   in-memory copy, persisted to localStorage so edits survive a
+   refresh. Nothing goes live until you click "نشر" (Publish),
+   which downloads an updated data.js to commit to GitHub.
 ════════════════════════════════════════════════ */
-const SB_URL  = 'https://hnyzgeucabtpppyxnsel.supabase.co';
-const SB_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhueXpnZXVjYWJ0cHBweXhuc2VsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MDI3ODMsImV4cCI6MjA5NjA3ODc4M30.nv0BG6B01YRL4fAPoLuBol7b9dY67nJTRI6dVCy4dc0';
-/* NOTE: The anon key is intentionally public — it's designed to be.
-   Security comes from Supabase RLS policies on the server, not from
-   keeping this key secret. See RLS setup in SUPABASE_RLS.sql */
-const sb = window.supabase.createClient(SB_URL, SB_ANON);
 
-/* Fetch site data — works for anon (public read allowed by RLS) */
-async function fetchFromSupabase() {
+/* Load baked-in data from data.js (deep clone so edits don't mutate it) */
+function loadBaked() {
   try {
-    const { data, error } = await sb.from('site_data').select('data').eq('id', 1).single();
-    if (error || !data?.data) return null;
-    return Object.keys(data.data).length ? data.data : null;
-  } catch(e) { return null; }
+    if (window.SITE_DATA && Object.keys(window.SITE_DATA).length) {
+      return JSON.parse(JSON.stringify(window.SITE_DATA));
+    }
+  } catch(e) {}
+  return null;
 }
 
-/* Save site data — SECURITY: only works when authenticated (enforced by RLS).
-   Anon users calling this will get a 403 from Supabase. */
-async function saveToSupabase(data) {
-  const { error } = await sb.from('site_data')
-    .update({ data, updated_at: new Date().toISOString() })
-    .eq('id', 1);
-  if (error) {
-    console.warn('Supabase save error:', error.message);
-    toast('تعذّر الحفظ في قاعدة البيانات — ' + error.message, 'error');
-  }
+/* Marks that there are unpublished changes (shown in the topbar) */
+function markDirty(on) {
+  const b = document.getElementById('dirtyBadge');
+  if (b) b.style.display = on ? 'inline-flex' : 'none';
 }
 
 /* ════════════════════════════════════════════════
@@ -918,189 +890,93 @@ function validateData(d) {
   return d;
 }
 
+const ADMIN_DRAFT_KEY = 'adminDraft';
+
+/* Load working copy: unpublished draft (localStorage) → baked data.js → DEFAULTS */
 function loadLocal() {
+  const base = () => JSON.parse(JSON.stringify(DEFAULTS));
+  /* 1) Unpublished draft from a previous session */
   try {
-    const raw = localStorage.getItem('restaurantData');
-    if (!raw) return JSON.parse(JSON.stringify(DEFAULTS));
-    const parsed = JSON.parse(raw);
-    return validateData(Object.assign({}, JSON.parse(JSON.stringify(DEFAULTS)), parsed)) || JSON.parse(JSON.stringify(DEFAULTS));
-  } catch(e) { return JSON.parse(JSON.stringify(DEFAULTS)); }
+    const raw = localStorage.getItem(ADMIN_DRAFT_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      markDirty(true); /* a draft means there are unpublished changes */
+      return validateData(Object.assign(base(), parsed)) || base();
+    }
+  } catch(e) {}
+  /* 2) Baked-in published data from data.js */
+  const baked = loadBaked();
+  if (baked) return validateData(Object.assign(base(), baked)) || base();
+  /* 3) Hardcoded defaults */
+  return base();
 }
 
+/* Persisting an edit writes a local DRAFT only (does NOT go live) */
 function saveLocal(data) {
-  localStorage.setItem('restaurantData', JSON.stringify(data));
+  localStorage.setItem(ADMIN_DRAFT_KEY, JSON.stringify(data));
 }
 
 function getData() { return window._siteData || (window._siteData = loadLocal()); }
 
-/* Save to localStorage immediately + sync to Supabase in background */
+/* Save the edit to the local draft and flag unpublished changes */
 function persist() {
   saveLocal(window._siteData);
-  saveToSupabase(window._siteData); /* async — runs in background */
+  markDirty(true);
 }
 
-/* ════════════════════════════════════════════════
-   BRUTE-FORCE PROTECTION
-   SECURITY: Locks account after 5 failed attempts for 15 minutes.
-   Stored in localStorage so it persists across page refreshes.
-════════════════════════════════════════════════ */
-const BF_MAX  = 5;                    /* max failed attempts before lockout */
-const BF_LOCK = 15 * 60 * 1000;      /* lockout duration: 15 minutes */
-
-function getBF() {
-  try { return JSON.parse(localStorage.getItem('_bf') || '{"n":0,"t":0}'); }
-  catch(e) { return {n:0,t:0}; }
+/* Build the exact data.js file contents (used by Publish + tests) */
+function buildDataJS() {
+  const clean = JSON.parse(JSON.stringify(getData()));
+  delete clean.credentials; /* never write credentials into the public file */
+  return '/* Auto-generated site data -- replaces Supabase. Edit via the admin panel + Publish. */\n' +
+    'window.SITE_DATA = ' + JSON.stringify(clean, null, 2) + ';\n';
 }
 
-/* Returns lockout message string if locked, null if allowed to proceed */
-function checkBF() {
-  const s = getBF();
-  const elapsed = Date.now() - s.t;
-  if (s.n >= BF_MAX && elapsed < BF_LOCK) {
-    const mins = Math.ceil((BF_LOCK - elapsed) / 60000);
-    return `تم تأمين الحساب مؤقتاً. حاول مجدداً بعد ${mins} دقيقة`;
-  }
-  if (elapsed > BF_LOCK) resetBF(); /* auto-reset after lockout period */
-  return null;
+/* ── PUBLISH: download an updated data.js to commit to GitHub ── */
+function publishData() {
+  const body = buildDataJS();
+  /* UTF-8 without BOM */
+  const blob = new Blob([body], { type: 'application/javascript;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'data.js';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  localStorage.setItem('_lastBackup', Date.now());
+  toast('تم تنزيل data.js ✓ — ارفعه إلى GitHub لنشر التغييرات', 'success');
 }
 
-function recordFailedAttempt() {
-  const s = getBF();
-  /* Reset counter if previous attempt was before lockout window */
-  const n = (Date.now() - s.t > BF_LOCK) ? 1 : s.n + 1;
-  localStorage.setItem('_bf', JSON.stringify({ n, t: Date.now() }));
+/* ── DISCARD: throw away unpublished edits, reload from data.js ── */
+function discardChanges() {
+  confirm_('سيتم التراجع عن جميع التغييرات غير المنشورة والعودة إلى البيانات المنشورة. متأكد؟', () => {
+    localStorage.removeItem(ADMIN_DRAFT_KEY);
+    const baked = loadBaked();
+    window._siteData = baked
+      ? (validateData(Object.assign(JSON.parse(JSON.stringify(DEFAULTS)), baked)) || JSON.parse(JSON.stringify(DEFAULTS)))
+      : JSON.parse(JSON.stringify(DEFAULTS));
+    markDirty(false);
+    renderOverview(); updateOrdersBadge();
+    if (typeof renderMenuTable === 'function') renderMenuTable();
+    toast('تم التراجع عن التغييرات غير المنشورة ✓', 'success');
+  });
 }
 
-function resetBF() { localStorage.removeItem('_bf'); }
-
-/* ════════════════════════════════════════════════
-   IDLE TIMER — auto-logout after 30 min inactivity
-   SECURITY: Prevents unauthorized access if admin leaves session open.
-════════════════════════════════════════════════ */
-const IDLE_MS = 30 * 60 * 1000; /* 30 minutes */
-let _idleTimer;
-
-function resetIdleTimer() {
-  clearTimeout(_idleTimer);
-  _idleTimer = setTimeout(async () => {
-    toast('تم تسجيل الخروج تلقائياً لعدم النشاط (30 دقيقة)', 'warning');
-    await new Promise(r => setTimeout(r, 2500));
-    doLogout();
-  }, IDLE_MS);
-}
-
-function startIdleTimer() {
-  ['click','keydown','mousemove','touchstart'].forEach(ev =>
-    document.addEventListener(ev, resetIdleTimer, { passive: true })
-  );
-  resetIdleTimer();
-}
-
-function stopIdleTimer() {
-  clearTimeout(_idleTimer);
-  ['click','keydown','mousemove','touchstart'].forEach(ev =>
-    document.removeEventListener(ev, resetIdleTimer)
-  );
-}
-
-/* ════════════════════════════════════════════════
-   AUTH — uses Supabase Auth (real server-side authentication)
-   SECURITY: Passwords are hashed by Supabase using bcrypt.
-   No credentials are stored in the site data JSON.
-════════════════════════════════════════════════ */
-async function doLogin() {
-  const email = document.getElementById('loginUser').value.trim();
-  const pass  = document.getElementById('loginPass').value;
-  const btn   = document.querySelector('.btn-login');
-  const errEl = document.getElementById('loginError');
-  const lockEl= document.getElementById('lockoutNotice');
-
-  /* SECURITY: Check brute-force lockout before attempting login */
-  const lockMsg = checkBF();
-  if (lockMsg) {
-    lockEl.style.display = 'block';
-    lockEl.textContent = lockMsg;
-    return;
-  }
-
-  /* Basic input validation */
-  if (!email || !pass) {
-    errEl.style.display = 'flex';
-    document.getElementById('loginErrMsg').textContent = 'أدخل البريد وكلمة المرور';
-    return;
-  }
-
-  /* Loading state */
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحقق...';
-  btn.disabled = true;
-  errEl.style.display = 'none';
-  lockEl.style.display = 'none';
-
-  /* SECURITY: Real server-side login via Supabase Auth */
-  const { data, error } = await sb.auth.signInWithPassword({ email, password: pass });
-
-  btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> دخول';
-  btn.disabled = false;
-
-  if (error) {
-    /* Record failed attempt for brute-force tracking */
-    recordFailedAttempt();
-    const state = getBF();
-    const remaining = BF_MAX - state.n;
-    if (remaining <= 0) {
-      lockEl.style.display = 'block';
-      lockEl.textContent = checkBF();
-    } else {
-      errEl.style.display = 'flex';
-      document.getElementById('loginErrMsg').textContent =
-        `بريد أو كلمة مرور غلط — تبقى ${remaining} محاولات`;
-    }
-    return;
-  }
-
-  /* Login success */
-  resetBF();
-  /* onAuthStateChange listener will call showAdminPanel() */
-}
-
-async function doLogout() {
-  stopIdleTimer();
-  stopKeepAlive();
-  await sb.auth.signOut();
-  location.reload();
-}
-
-/* Keep-alive ping every 14 min to prevent Render free tier from sleeping */
-let _keepAliveTimer;
-function startKeepAlive() {
-  _keepAliveTimer = setInterval(() => {
-    fetch(window.location.origin, { method: 'HEAD', cache: 'no-store' }).catch(()=>{});
-  }, 14 * 60 * 1000);
-}
-function stopKeepAlive() { clearInterval(_keepAliveTimer); }
-
-/* Backup reminder — warn if no export in 7+ days */
+/* Publish reminder — warn if no data.js download in 7+ days */
 function checkBackupReminder() {
   const last = parseInt(localStorage.getItem('_lastBackup') || '0');
   if (!last) return;
   const days = Math.floor((Date.now() - last) / 86400000);
-  if (days >= 7) setTimeout(() => toast(`⚠️ لم تقم بنسخ احتياطي منذ ${days} أيام — يُنصح بالتصدير من الإعدادات`, 'warning'), 3000);
+  if (days >= 7) setTimeout(() => toast(`⚠️ لم تقم بالنشر منذ ${days} أيام — لا تُحفظ التغييرات على الموقع حتى تنشر data.js`, 'warning'), 3000);
 }
 
-function showAdminPanel(email) {
-  document.getElementById('loginPage').style.display = 'none';
+/* Static admin — no login. Show the panel and load data. */
+function showAdminPanel() {
   document.getElementById('adminPanel').style.display = 'block';
-  document.getElementById('adminName').textContent = email || 'Admin';
-  document.getElementById('adminInitial').textContent = (email||'A')[0].toUpperCase();
-  startIdleTimer();
-  startKeepAlive();
+  document.getElementById('adminName').textContent = 'Admin';
+  document.getElementById('adminInitial').textContent = 'A';
   checkBackupReminder();
   initDashboard();
 }
-
-/* Allow Enter key on login form */
-document.getElementById('loginPass').addEventListener('keydown', e => { if(e.key==='Enter') doLogin(); });
-document.getElementById('loginUser').addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('loginPass').focus(); });
 
 /* ════════════════════════════════════════════════
    NAVIGATION
@@ -1141,23 +1017,9 @@ function closeSidebar() {
 /* ════════════════════════════════════════════════
    INIT
 ════════════════════════════════════════════════ */
-async function initDashboard() {
-  /* Show loading spinner while fetching from Supabase */
-  document.getElementById('statsGrid').innerHTML = `
-    <div style="grid-column:1/-1;text-align:center;padding:50px;color:var(--muted)">
-      <i class="fas fa-spinner fa-spin" style="font-size:28px;color:var(--red)"></i>
-      <p style="margin-top:12px;font-weight:700">جاري تحميل البيانات...</p>
-    </div>`;
-
-  /* Try Supabase first, fall back to localStorage */
-  const remote = await fetchFromSupabase();
-  if (remote) {
-    window._siteData = Object.assign({}, JSON.parse(JSON.stringify(DEFAULTS)), remote);
-    saveLocal(window._siteData); /* update local cache */
-  } else {
-    window._siteData = loadLocal();
-  }
-
+function initDashboard() {
+  /* Load working copy: unpublished draft → baked data.js → defaults */
+  window._siteData = loadLocal();
   updateOrdersBadge();
   renderOverview();
 }
@@ -1208,7 +1070,7 @@ function renderOverview() {
       <div class="card-body">
         ${popularItems.length ? popularItems.map(item=>`
           <div style="display:flex;align-items:center;gap:12px;padding:8px 0;border-bottom:1px solid var(--border)">
-            <img src="${item.image}" style="width:40px;height:40px;object-fit:cover;border-radius:8px" onerror="this.src='https://via.placeholder.com/40'"/>
+            <img src="${item.image}" style="width:40px;height:40px;object-fit:cover;border-radius:8px" onerror="this.src=window.__PH"/>
             <div style="flex:1">
               <div style="font-size:13px;font-weight:700">${item.name}</div>
               <div style="font-size:11px;color:var(--muted)">${CAT_NAMES[item.category]||item.category}</div>
@@ -1235,7 +1097,7 @@ function renderMenuTable() {
   /* SECURITY: escapeHTML on all user data rendered into innerHTML */
   document.getElementById('menuTbody').innerHTML = items.length ? items.map(item => `
     <tr>
-      <td><img class="td-img" src="${sanitizeURL(item.image)||'https://placehold.co/50'}" alt="${escapeHTML(item.name)}" onerror="this.src='https://placehold.co/50'"/></td>
+      <td><img class="td-img" src="${sanitizeURL(item.image)||PH}" alt="${escapeHTML(item.name)}" onerror="this.src=window.__PH"/></td>
       <td style="font-weight:700">${escapeHTML(item.name)}</td>
       <td><span style="font-weight:800;color:var(--gold)">${Number(item.price).toLocaleString()} ل.ل</span></td>
       <td><span class="badge badge-blue">${escapeHTML(CAT_NAMES[item.category]||item.category)}</span></td>
@@ -1470,7 +1332,7 @@ function renderGrills() {
   /* SECURITY: escapeHTML on all rendered grills data */
   document.getElementById('grillsTbody').innerHTML = d.grills.length ? d.grills.map(g => `
     <tr>
-      <td><img class="td-img" src="${sanitizeURL(g.image)||'https://placehold.co/50'}" alt="${escapeHTML(g.name)}" onerror="this.src='https://placehold.co/50'"/></td>
+      <td><img class="td-img" src="${sanitizeURL(g.image)||PH}" alt="${escapeHTML(g.name)}" onerror="this.src=window.__PH"/></td>
       <td style="font-weight:700">${escapeHTML(g.name)}</td>
       <td><span style="font-weight:800;color:var(--gold)">${Number(g.price).toLocaleString()} ل.ل</span></td>
       <td><label class="toggle"><input type="checkbox" ${g.popular?'checked':''} onchange="toggleGrillPopular(${g.id})"/><span class="toggle-slider"></span></label></td>
@@ -1559,7 +1421,7 @@ function renderFatoor() {
     const get = label => s.find(x=>x.label===label)?.price || '—';
     return `
     <tr>
-      <td><img class="td-img" src="${sanitizeURL(item.image)||'https://placehold.co/50'}" alt="${escapeHTML(item.name)}" onerror="this.src='https://placehold.co/50'"/></td>
+      <td><img class="td-img" src="${sanitizeURL(item.image)||PH}" alt="${escapeHTML(item.name)}" onerror="this.src=window.__PH"/></td>
       <td style="font-weight:800">${escapeHTML(item.emoji||'')} ${escapeHTML(item.name)}</td>
       <td style="color:var(--gold);font-weight:700">${Number(get('صغير')).toLocaleString()} ل.ل</td>
       <td style="color:var(--gold);font-weight:700">${Number(get('وسط')).toLocaleString()} ل.ل</td>
@@ -1656,7 +1518,7 @@ function renderOffers() {
   const items = d.offers || [];
   document.getElementById('offersTbody').innerHTML = items.length ? items.map(item => `
     <tr>
-      <td><img class="td-img" src="${sanitizeURL(item.image||'')}" onerror="this.src='https://placehold.co/50'" style="${item.image?'':'opacity:.3'}"/></td>
+      <td><img class="td-img" src="${sanitizeURL(item.image||'')}" onerror="this.src=window.__PH" style="${item.image?'':'opacity:.3'}"/></td>
       <td style="font-weight:700">${escapeHTML(item.name)}</td>
       <td style="color:var(--muted);font-size:13px">${escapeHTML(item.description||'')}</td>
       <td style="color:var(--gold);font-weight:800">${item.price?Number(item.price).toLocaleString()+' ل.ل':'—'}</td>
@@ -1722,7 +1584,7 @@ function renderMansaf() {
     const get = label => (item.sizes||[]).find(x=>x.label===label)?.price || '—';
     return `
     <tr>
-      <td><img class="td-img" src="${sanitizeURL(item.image||'')}" onerror="this.src='https://placehold.co/50'" style="${item.image?'':'opacity:.3'}"/></td>
+      <td><img class="td-img" src="${sanitizeURL(item.image||'')}" onerror="this.src=window.__PH" style="${item.image?'':'opacity:.3'}"/></td>
       <td style="font-weight:700">${escapeHTML(item.name)}</td>
       <td style="color:var(--gold);font-weight:700">${Number(get('صغير')).toLocaleString()} ل.ل</td>
       <td style="color:var(--gold);font-weight:700">${Number(get('كبير')).toLocaleString()} ل.ل</td>
@@ -1822,7 +1684,7 @@ function renderDrinksAdmin() {
           <tbody>
             ${(cat.items||[]).length ? (cat.items||[]).map((item,idx)=>`
               <tr>
-                <td><img class="td-img" src="${sanitizeURL(item.image||'')}" onerror="this.src='https://placehold.co/50'" style="${item.image?'':'opacity:.3'}"/></td>
+                <td><img class="td-img" src="${sanitizeURL(item.image||'')}" onerror="this.src=window.__PH" style="${item.image?'':'opacity:.3'}"/></td>
                 <td style="font-weight:700">${escapeHTML(item.name)}</td>
                 ${(item.prices||[]).map(p=>`<td style="color:var(--gold);font-weight:800">${Number(p).toLocaleString()}</td>`).join('')}
                 <td><div style="display:flex;gap:4px">
@@ -2299,7 +2161,7 @@ function renderMedia() {
       <div class="card-head"><h3>📤 رفع صورة جديدة من جهازك</h3></div>
       <div class="card-body">
         <p style="font-size:13px;color:var(--muted);margin-bottom:16px">
-          ارفع صورة مباشرة من هاتفك أو جهازك — ستُحفظ في Supabase وتحصل على رابط جاهز للاستخدام.
+          ارفع صورة مباشرة من هاتفك أو جهازك — تُضغط وتُحوَّل إلى صيغة base64 وتُنسخ للحافظة، الصقها في حقل صورة أي صنف. لا حاجة لأي خادم.
         </p>
         <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
           <button class="btn btn-primary" id="libraryUploadBtn" type="button">
@@ -2333,7 +2195,7 @@ function renderMedia() {
         <div class="media-grid">
           ${images.map(img=>`
             <div class="media-item">
-              <img src="${img.url}" alt="${img.label}" onerror="this.src='https://via.placeholder.com/140x110?text=Error'" loading="lazy"/>
+              <img src="${img.url}" alt="${img.label}" onerror="this.src=window.__PH" loading="lazy"/>
               <div class="media-item-body">
                 <div class="media-item-name">${img.label}</div>
               </div>
@@ -2411,34 +2273,19 @@ function renderSettings() {
   document.getElementById('settingsEditor').innerHTML = `
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
 
-      <!-- SECURITY: Password reset via Supabase Auth email (server-side hashed) -->
+      <!-- Publish -->
       <div class="card">
-        <div class="card-head"><h3>🔐 تغيير كلمة المرور</h3></div>
+        <div class="card-head"><h3>🚀 نشر التغييرات</h3></div>
         <div class="card-body">
           <p style="font-size:13px;color:var(--muted);margin-bottom:16px">
-            سيُرسَل رابط تغيير كلمة المرور إلى بريدك الإلكتروني.<br>
-            كلمة المرور محمية بـ bcrypt على خوادم Supabase.
+            التعديلات تُحفظ محلياً في متصفحك فقط. لنشرها على الموقع:
+            اضغط <b>نشر</b> لتنزيل ملف <code>data.js</code>، ثم ارفعه إلى مستودع GitHub
+            (استبدل الملف القديم) — سيُحدَّث الموقع بعد إعادة النشر.
           </p>
-          <button class="btn btn-primary" onclick="sendPasswordReset()">
-            <i class="fas fa-envelope"></i> إرسال رابط تغيير كلمة المرور
-          </button>
-        </div>
-      </div>
-
-      <!-- SECURITY: MFA / Two-Factor Authentication -->
-      <div class="card">
-        <div class="card-head"><h3>🛡️ المصادقة الثنائية (MFA)</h3></div>
-        <div class="card-body" id="mfaSection">
-          <p style="font-size:13px;color:var(--muted);margin-bottom:16px">
-            أضف طبقة حماية ثانية: بعد تفعيلها، ستحتاج رمزاً من تطبيق
-            Google Authenticator أو Authy عند كل تسجيل دخول.
-          </p>
-          <button class="btn btn-success" onclick="setupMFA()">
-            <i class="fas fa-shield-alt"></i> تفعيل المصادقة الثنائية
-          </button>
-          <button class="btn btn-danger" style="margin-top:10px" onclick="disableMFA()">
-            <i class="fas fa-shield-xmark"></i> إلغاء تفعيل MFA
-          </button>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <button class="btn btn-success" onclick="publishData()"><i class="fas fa-cloud-arrow-up"></i> نشر (تنزيل data.js)</button>
+            <button class="btn btn-secondary" onclick="discardChanges()"><i class="fas fa-rotate-left"></i> تجاهل التغييرات غير المنشورة</button>
+          </div>
         </div>
       </div>
 
@@ -2471,77 +2318,6 @@ function renderSettings() {
       </div>
     </div>
   `;
-}
-
-/* SECURITY: Password reset email — Supabase handles hashing, not us */
-async function sendPasswordReset() {
-  const { data: { user } } = await sb.auth.getUser();
-  if (!user?.email) { toast('لم يتم العثور على بريدك الإلكتروني','error'); return; }
-  const { error } = await sb.auth.resetPasswordForEmail(user.email, {
-    redirectTo: window.location.origin + '/admin.html'
-  });
-  if (error) { toast('خطأ في الإرسال: ' + error.message,'error'); return; }
-  toast('تم إرسال رابط تغيير كلمة المرور إلى بريدك ✓','success');
-}
-
-/* SECURITY: Setup TOTP-based MFA via Supabase Auth */
-async function setupMFA() {
-  const { data, error } = await sb.auth.mfa.enroll({ factorType: 'totp' });
-  if (error) { toast('خطأ في إعداد MFA: ' + error.message,'error'); return; }
-  document.getElementById('modalTitle').textContent = 'إعداد المصادقة الثنائية 🛡️';
-  document.getElementById('modalBody').innerHTML = `
-    <p style="font-size:13px;color:var(--muted);margin-bottom:16px">
-      1. افتح <b>Google Authenticator</b> أو <b>Authy</b><br>
-      2. امسح الرمز أدناه<br>
-      3. أدخل الرمز المكوّن من 6 أرقام للتأكيد
-    </p>
-    <div style="text-align:center;margin-bottom:18px">
-      <img src="${data.totp.qr_code}" style="width:200px;height:200px;border-radius:12px;border:2px solid var(--border)"/>
-    </div>
-    <div class="form-group">
-      <label>المفتاح السري (للإدخال اليدوي)</label>
-      <input class="form-control" value="${escapeHTML(data.totp.secret)}" readonly style="font-size:11px;letter-spacing:1px"/>
-    </div>
-    <div class="form-group">
-      <label>رمز التأكيد (6 أرقام) *</label>
-      <input class="form-control" id="mfa_code" placeholder="000000" maxlength="6"
-             inputmode="numeric" pattern="[0-9]*"
-             style="text-align:center;font-size:22px;letter-spacing:6px;font-weight:900"/>
-    </div>`;
-  document.getElementById('modalFooter').innerHTML = `
-    <button class="btn btn-primary" onclick="verifyMFAEnroll('${escapeHTML(data.id)}')">
-      <i class="fas fa-check"></i> تفعيل
-    </button>
-    <button class="btn btn-secondary" onclick="closeModal()">إلغاء</button>`;
-  openModal();
-}
-
-async function verifyMFAEnroll(factorId) {
-  const code = document.getElementById('mfa_code')?.value?.replace(/\D/g,'');
-  if (!code || code.length !== 6) { toast('أدخل رمزاً مكوّناً من 6 أرقام','error'); return; }
-  const { data: ch, error: cErr } = await sb.auth.mfa.challenge({ factorId });
-  if (cErr) { toast('خطأ: ' + cErr.message,'error'); return; }
-  const { error } = await sb.auth.mfa.verify({ factorId, challengeId: ch.id, code });
-  if (error) { toast('رمز غلط، حاول مجدداً','error'); return; }
-  toast('تم تفعيل المصادقة الثنائية بنجاح! 🛡️','success');
-  closeModal();
-}
-
-async function disableMFA() {
-  const { data } = await sb.auth.mfa.listFactors();
-  const factors = data?.totp || [];
-  if (!factors.length) { toast('لا يوجد MFA مفعّل','warning'); return; }
-  confirm_('إلغاء تفعيل المصادقة الثنائية؟ سيصبح حسابك أقل أماناً.', async () => {
-    for (const f of factors) {
-      await sb.auth.mfa.unenroll({ factorId: f.id });
-    }
-    toast('تم إلغاء المصادقة الثنائية','success');
-  });
-}
-
-/* Legacy savePassword — kept for compatibility but no longer does anything sensitive */
-function savePassword() {
-  toast('تم تحديث بيانات الدخول ✓','success');
 }
 
 function exportData() {
@@ -2640,31 +2416,39 @@ async function compressImage(file, maxWidth = 1200, quality = 0.82) {
   });
 }
 
+/* Convert a Blob/File to a base64 data: URL (self-contained, no server) */
+function blobToDataURL(blob) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result);
+    r.onerror = reject;
+    r.readAsDataURL(blob);
+  });
+}
+
 async function uploadImageToLibrary(file) {
   const urlEl  = document.getElementById('uploadedUrl');
   const prevEl = document.getElementById('uploadedPreview');
   if (!file) return;
   if (!file.type.startsWith('image/')) { toast('يجب أن يكون الملف صورة','error'); return; }
   if (file.size > 8 * 1024 * 1024) { toast('الحد الأقصى 8MB','error'); return; }
-  toast('⏳ جاري الرفع...','warning');
+  toast('⏳ جاري المعالجة...','warning');
   try {
     const compressed = await compressImage(file);
-    const fileName = `img_${Date.now()}.jpg`;
-    const { error } = await sb.storage.from('restaurant-images').upload(fileName, compressed, { cacheControl:'31536000', upsert:false, contentType:'image/jpeg' });
-    if (error) throw error;
-    const { data } = sb.storage.from('restaurant-images').getPublicUrl(fileName);
-    if (urlEl) { urlEl.textContent = data.publicUrl; urlEl.style.color = 'var(--green)'; }
-    if (prevEl) { prevEl.src = data.publicUrl; prevEl.style.display = 'block'; }
-    /* Copy to clipboard */
-    navigator.clipboard?.writeText(data.publicUrl).catch(()=>{});
-    toast('تم الرفع — الرابط نُسخ للحافظة ✓','success');
-  } catch(err) { toast('خطأ: ' + err.message,'error'); }
+    const dataUrl = await blobToDataURL(compressed);
+    if (urlEl) { urlEl.textContent = 'صورة جاهزة (base64) — استخدمها في أي صنف'; urlEl.style.color = 'var(--green)'; }
+    if (prevEl) { prevEl.src = dataUrl; prevEl.style.display = 'block'; }
+    /* Copy the data URL to clipboard for pasting into any image field */
+    navigator.clipboard?.writeText(dataUrl).catch(()=>{});
+    toast('تمت المعالجة — نُسخت الصورة للحافظة، الصقها في حقل الصورة ✓','success');
+  } catch(err) { toast('خطأ: ' + (err.message||err),'error'); }
 }
 
 /* ════════════════════════════════════════════════
-   IMAGE UPLOAD — Supabase Storage
-   Uploads image directly from device to Supabase,
-   then fills the URL input automatically.
+   IMAGE UPLOAD — base64 data URL (self-contained)
+   Reads the image from the device, compresses it, and stores it
+   inline as a base64 data: URL. No server / storage bucket needed.
+   The image travels with data.js when you Publish.
 ════════════════════════════════════════════════ */
 async function uploadImage(file, inputId, previewId) {
   if (!file) return;
@@ -2681,36 +2465,25 @@ async function uploadImage(file, inputId, previewId) {
     return;
   }
 
-  toast('⏳ جاري رفع الصورة...', 'warning');
+  toast('⏳ جاري معالجة الصورة...', 'warning');
 
   try {
     const compressed = await compressImage(file);
-    const fileName = `img_${Date.now()}_${Math.random().toString(36).slice(2)}.jpg`;
+    const dataUrl = await blobToDataURL(compressed);
 
-    /* Upload to Supabase Storage bucket "restaurant-images" */
-    const { error: upErr } = await sb.storage
-      .from('restaurant-images')
-      .upload(fileName, compressed, { cacheControl: '31536000', upsert: false, contentType: 'image/jpeg' });
-
-    if (upErr) throw upErr;
-
-    /* Get public URL */
-    const { data } = sb.storage
-      .from('restaurant-images')
-      .getPublicUrl(fileName);
-
-    /* Fill URL input and show preview */
+    /* Fill URL input with the base64 data URL and show preview */
     const input = document.getElementById(inputId);
     if (input) {
-      input.value = data.publicUrl;
+      input.value = dataUrl;
       previewImg(inputId, previewId);
+      input.dispatchEvent(new Event('input', { bubbles: true }));
     }
 
-    toast('تم رفع الصورة بنجاح ✓', 'success');
+    toast('تمت إضافة الصورة بنجاح ✓', 'success');
 
   } catch (err) {
-    console.error('Upload error:', err);
-    toast('خطأ في رفع الصورة: ' + (err.message || 'تأكد من إعداد Supabase Storage'), 'error');
+    console.error('Image error:', err);
+    toast('خطأ في معالجة الصورة: ' + (err.message || err), 'error');
   }
 }
 
@@ -2753,29 +2526,10 @@ function toggleSection(bodyId) {
 }
 
 /* ════════════════════════════════════════════════
-   INIT ON LOAD
-   SECURITY: Uses Supabase Auth state — cannot be bypassed
-   via browser console unlike the old sessionStorage check.
+   INIT ON LOAD — static admin, no login
 ════════════════════════════════════════════════ */
-window.addEventListener('load', async () => {
-  /* Listen for auth state changes (login / logout / token refresh) */
-  sb.auth.onAuthStateChange((event, session) => {
-    if (session && event !== 'SIGNED_OUT') {
-      /* Only show panel if Supabase confirms a valid session */
-      if (document.getElementById('adminPanel').style.display !== 'block') {
-        showAdminPanel(session.user.email);
-      }
-    } else if (event === 'SIGNED_OUT') {
-      document.getElementById('adminPanel').style.display = 'none';
-      document.getElementById('loginPage').style.display = 'flex';
-    }
-  });
-
-  /* Check if already logged in (e.g. page refresh with active session) */
-  const { data: { session } } = await sb.auth.getSession();
-  if (session) {
-    showAdminPanel(session.user.email);
-  }
+window.addEventListener('load', () => {
+  showAdminPanel();
 });
 </script>
 </body>

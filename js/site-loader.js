@@ -1,43 +1,17 @@
 /**
  * site-loader.js
- * Fetches restaurant data from Supabase and applies it to index.html.
- * Falls back to localStorage cache if Supabase is unreachable.
+ * Applies the baked-in restaurant data (window.SITE_DATA from data.js) to index.html.
+ * Fully static — no database, no network calls.
  */
 
 (function () {
   'use strict';
 
-  /* ── Supabase config (same as admin.html) ── */
-  const SB_URL = 'https://hnyzgeucabtpppyxnsel.supabase.co';
-  const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhueXpnZXVjYWJ0cHBweXhuc2VsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1MDI3ODMsImV4cCI6MjA5NjA3ODc4M30.nv0BG6B01YRL4fAPoLuBol7b9dY67nJTRI6dVCy4dc0';
-
-  /* ── Fetch from Supabase ── */
-  async function fetchData() {
-    try {
-      const res = await fetch(`${SB_URL}/rest/v1/site_data?id=eq.1&select=data`, {
-        headers: { 'apikey': SB_KEY, 'Authorization': `Bearer ${SB_KEY}` }
-      });
-      const rows = await res.json();
-      const data = rows[0]?.data;
-      if (data && Object.keys(data).length) {
-        /* Cache with timestamp for staleness check */
-        localStorage.setItem('restaurantData', JSON.stringify({ data, ts: Date.now() }));
-        return data;
-      }
-    } catch (e) { /* network error — fall through to cache */ }
-
-    /* Fallback: localStorage cache (max 24h old) */
-    try {
-      const raw = localStorage.getItem('restaurantData');
-      if (!raw) return null;
-      const cached = JSON.parse(raw);
-      /* Support both old format (plain object) and new format ({data, ts}) */
-      if (cached && cached.data && cached.ts) {
-        if (Date.now() - cached.ts < 24 * 60 * 60 * 1000) return cached.data;
-        return null; /* cache expired */
-      }
-      return cached; /* old format fallback */
-    } catch (e) { return null; }
+  /* ── Read baked-in data from data.js (window.SITE_DATA) ── */
+  function fetchData() {
+    const data = window.SITE_DATA;
+    if (data && typeof data === 'object' && Object.keys(data).length) return data;
+    return null; /* data.js missing/empty — keep hardcoded HTML defaults */
   }
 
   /* ── SECURITY: Escape HTML special characters to prevent XSS ── */
@@ -50,11 +24,18 @@
       .replace(/'/g, '&#x27;');
   }
 
-  /* ── SECURITY: Only allow http/https image URLs — block javascript: and data: ── */
+  /* ── Self-contained placeholder (no external host — CSP-safe) ── */
+  const PH = "data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='300'%20height='200'%3E%3Crect%20width='100%25'%20height='100%25'%20fill='%231f1f1f'/%3E%3Ctext%20x='50%25'%20y='50%25'%20fill='%23888070'%20font-family='sans-serif'%20font-size='16'%20text-anchor='middle'%20dominant-baseline='middle'%3E%D8%B5%D9%88%D8%B1%D8%A9%3C/text%3E%3C/svg%3E";
+  window.__PH = PH;
+
+  /* ── SECURITY: allow local paths, base64 images, and https — block javascript:/vbscript: ── */
   function sanitizeURL(url) {
     const s = String(url || '').trim();
-    if (/^https?:\/\//i.test(s)) return s;
-    return 'https://placehold.co/300x160?text=Image'; /* safe fallback */
+    if (!s) return PH;
+    if (/^data:image\//i.test(s)) return s;   /* base64 images from admin uploads */
+    if (/^https?:\/\//i.test(s)) return s;     /* remote (kept for compatibility) */
+    if (/^[a-z][a-z0-9+.-]*:/i.test(s)) return PH; /* any other scheme = unsafe */
+    return s;                                   /* relative/local path e.g. images/... */
   }
 
   /* ── Safely update text (uses textContent — immune to XSS) ── */
@@ -120,7 +101,7 @@
         ${item.popular ? '<span class="pop-badge">⭐ الأكثر طلباً</span>' : ''}
         <img src="${sanitizeURL(item.image)}"
              alt="${escapeHTML(item.name)}" loading="lazy"
-             onerror="this.src='https://placehold.co/300x160?text=Image'"/>
+             onerror="this.src=window.__PH"/>
         <div class="card-body">
           <div class="card-name">${escapeHTML(item.name)}</div>
           <div class="card-price">${Number(item.price).toLocaleString()} ل.ل</div>
@@ -171,7 +152,7 @@
         ${g.popular ? '<span class="pop-badge">⭐ الأكثر طلباً</span>' : ''}
         <img src="${sanitizeURL(g.image)}"
              alt="${escapeHTML(g.name)}" loading="lazy"
-             onerror="this.src='https://placehold.co/300x150?text=Image'"/>
+             onerror="this.src=window.__PH"/>
         <div class="grill-card-body">
           <div class="grill-card-name">${escapeHTML(g.name)}</div>
           <div class="grill-card-price">${Number(g.price).toLocaleString()} ل.ل</div>
@@ -207,7 +188,7 @@
     grid.innerHTML = offers.map(offer => `
       <div class="offer-card reveal">
         <img src="${sanitizeURL(offer.image)}" alt="${escapeHTML(offer.name)}" loading="lazy"
-             onerror="this.src='https://placehold.co/600x220?text=Image'"/>
+             onerror="this.src=window.__PH"/>
         <div class="offer-card-body">
           <div class="offer-card-name">${escapeHTML(offer.name)}</div>
           <div class="offer-card-desc">${escapeHTML(offer.description||'')}</div>
@@ -230,7 +211,7 @@
     grid.innerHTML = items.map(item => `
       <div class="fatoor-card reveal">
         <img src="${sanitizeURL(item.image)}" alt="${escapeHTML(item.name)}" loading="lazy"
-             onerror="this.src='https://placehold.co/500x200?text=Image'"/>
+             onerror="this.src=window.__PH"/>
         <div class="fatoor-card-body">
           <div class="fatoor-card-name">${escapeHTML(item.name)}</div>
           <div class="fatoor-sizes">
@@ -254,7 +235,7 @@
     grid.innerHTML = items.map(item => `
       <div class="fatoor-card reveal">
         <img src="${sanitizeURL(item.image)}" alt="${escapeHTML(item.name)}" loading="lazy"
-             onerror="this.src='https://placehold.co/500x200?text=Image'"/>
+             onerror="this.src=window.__PH"/>
         <div class="fatoor-card-body">
           <div class="fatoor-card-name">${escapeHTML(item.emoji||'')} ${escapeHTML(item.name)}</div>
           <div class="fatoor-sizes">
@@ -283,7 +264,7 @@
             ${cartCtrl(item.name + ' - ' + s, (item.prices||[])[i]||0)}
             <span class="drink-size-price">${Number((item.prices||[])[i]||0).toLocaleString()} ل.ل</span>
           </div>`).join('');
-        const img = item.image ? `<img src="${sanitizeURL(item.image)}" alt="${escapeHTML(item.name)}" loading="lazy" onerror="this.src='https://placehold.co/300x200?text=Image'"/>` : `<img src="https://placehold.co/300x200?text=Image" alt="${escapeHTML(item.name)}"/>`;
+        const img = item.image ? `<img src="${sanitizeURL(item.image)}" alt="${escapeHTML(item.name)}" loading="lazy" onerror="this.src=window.__PH"/>` : `<img src="${PH}" alt="${escapeHTML(item.name)}"/>`;
         return `<div class="drink-card reveal">
           ${img}
           <div class="drink-card-body">
@@ -316,7 +297,7 @@
               ${cartCtrl(item.name + ' - ' + s, (item.prices||[])[i]||0)}
               <span class="drink-size-price">${Number((item.prices||[])[i]||0).toLocaleString()} ل.ل</span>
             </div>`).join('');
-          const img = item.image ? `<img src="${sanitizeURL(item.image)}" alt="${escapeHTML(item.name)}" loading="lazy" onerror="this.src='https://placehold.co/300x200?text=Image'"/>` : `<img src="https://placehold.co/300x200?text=Image" alt="${escapeHTML(item.name)}"/>`;
+          const img = item.image ? `<img src="${sanitizeURL(item.image)}" alt="${escapeHTML(item.name)}" loading="lazy" onerror="this.src=window.__PH"/>` : `<img src="${PH}" alt="${escapeHTML(item.name)}"/>`;
           return `<div class="drink-card reveal">${img}<div class="drink-card-body"><div class="drink-card-name">${escapeHTML(item.name)}</div><div class="drink-sizes">${sizeRows}</div></div></div>`;
         }).join('');
         kiloHTML = `<div class="drinks-kilo"><div class="drinks-kilo-title">نصف كيلو / كيلو</div><div class="drinks-grid">${kiloCards}</div></div>`;
